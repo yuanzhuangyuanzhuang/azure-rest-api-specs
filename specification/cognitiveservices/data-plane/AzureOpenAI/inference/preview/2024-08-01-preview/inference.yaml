@@ -3783,6 +3783,10 @@ components:
         chunk_id:
           type: string
           description: The chunk ID of the citation.
+        rerank_score:
+          type: number
+          description: The rerank score of the retrieved document.
+          format: double
       description: citation information for a chat completions response message.
     retrievedDocument:
       type: object
@@ -3805,10 +3809,6 @@ components:
             original_search_score:
               type: number
               description: The original search score of the retrieved document.
-              format: double
-            rerank_score:
-              type: number
-              description: The rerank score of the retrieved document.
               format: double
             filter_reason:
               $ref: '#/components/schemas/filterReason'
