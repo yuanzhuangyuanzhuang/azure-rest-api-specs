@@ -246,8 +246,6 @@ paths:
           $ref: ./examples/chat_completions_azure_search_image_vector.yaml
         Creates a completion based on Azure Search vector data, previous assistant message and user-assigned managed identity.:
           $ref: ./examples/chat_completions_azure_search_advanced.yaml
-        Creates a completion for the provided AML index.:
-          $ref: ./examples/chat_completions_aml_index.yaml
         Creates a completion for the provided Azure Cosmos DB.:
           $ref: ./examples/chat_completions_cosmos_db.yaml
         Creates a completion for the provided Elasticsearch.:
@@ -2964,7 +2962,6 @@ components:
         propertyName: type
         mapping:
           azure_search: '#/components/schemas/azureSearchChatExtensionConfiguration'
-          azure_ml_index: '#/components/schemas/azureMachineLearningIndexChatExtensionConfiguration'
           azure_cosmos_db: '#/components/schemas/azureCosmosDBChatExtensionConfiguration'
           elasticsearch: '#/components/schemas/elasticsearchChatExtensionConfiguration'
           pinecone: '#/components/schemas/pineconeChatExtensionConfiguration'
@@ -2976,7 +2973,6 @@ components:
           The use of this configuration is compatible only with Azure OpenAI.
       enum:
         - azure_search
-        - azure_ml_index
         - azure_cosmos_db
         - elasticsearch
         - pinecone
@@ -2987,9 +2983,6 @@ components:
           - name: azureSearch
             value: azure_search
             description: Represents the use of Azure Search as an Azure OpenAI chat extension.
-          - name: azureMachineLearningIndex
-            value: azure_ml_index
-            description: Represents the use of Azure Machine Learning index as an Azure OpenAI chat extension.
           - name: azureCosmosDB
             value: azure_cosmos_db
             description: Represents the use of Azure Cosmos DB as an Azure OpenAI chat extension.
@@ -3134,73 +3127,6 @@ components:
           - name: vectorSemanticHybrid
             value: vector_semantic_hybrid
             description: Represents a combination of semantic search and vector data querying.
-    azureMachineLearningIndexChatExtensionConfiguration:
-      required:
-        - parameters
-      description: |-
-        A specific representation of configurable options for Azure Machine Learning vector index when using it as an Azure
-        OpenAI chat extension.
-      allOf:
-        - $ref: '#/components/schemas/azureChatExtensionConfiguration'
-        - properties:
-            parameters:
-              $ref: '#/components/schemas/azureMachineLearningIndexChatExtensionParameters'
-      x-ms-discriminator-value: azure_ml_index
-    azureMachineLearningIndexChatExtensionParameters:
-      required:
-        - authentication
-        - name
-        - project_resource_id
-        - version
-      type: object
-      properties:
-        authentication:
-          oneOf:
-            - $ref: '#/components/schemas/onYourDataAccessTokenAuthenticationOptions'
-            - $ref: '#/components/schemas/onYourDataSystemAssignedManagedIdentityAuthenticationOptions'
-            - $ref: '#/components/schemas/onYourDataUserAssignedManagedIdentityAuthenticationOptions'
-        top_n_documents:
-          type: integer
-          description: The configured top number of documents to feature for the configured query.
-          format: int32
-        max_search_queries:
-          type: integer
-          description: The max number of rewritten queries should be send to search provider for one user message. If not specified, the system will decide the number of queries to send.
-          format: int32
-        allow_partial_result:
-          type: boolean
-          default: false
-          description: If specified as true, the system will allow partial search results to be used and the request fails if all the queries fail. If not specified, or specified as false, the request will fail if any search query fails.
-        in_scope:
-          type: boolean
-          description: Whether queries should be restricted to use of indexed data.
-        strictness:
-          maximum: 5
-          minimum: 1
-          type: integer
-          description: The configured strictness of the search relevance filtering. The higher of strictness, the higher of the precision but lower recall of the answer.
-          format: int32
-        role_information:
-          type: string
-          description: Give the model instructions about how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses. There's a 100 token limit for it, and it counts against the overall token limit.
-        project_resource_id:
-          type: string
-          description: The resource ID of the Azure Machine Learning project.
-        name:
-          type: string
-          description: The Azure Machine Learning vector index name.
-        version:
-          type: string
-          description: The version of the Azure Machine Learning vector index.
-        filter:
-          type: string
-          description: Search filter. Only supported if the Azure Machine Learning vector index is of type AzureSearch.
-        include_contexts:
-          type: array
-          description: The included properties of the output context. If not specified, the default value is `citations` and `intent`.
-          items:
-            $ref: '#/components/schemas/onYourDataContextProperty'
-      description: Parameters for the Azure Machine Learning vector index chat extension.
     azureCosmosDBChatExtensionConfiguration:
       required:
         - parameters
