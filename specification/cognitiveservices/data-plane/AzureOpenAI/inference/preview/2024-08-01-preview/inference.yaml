@@ -3038,9 +3038,6 @@ components:
           type: integer
           description: The configured strictness of the search relevance filtering. The higher of strictness, the higher of the precision but lower recall of the answer.
           format: int32
-        role_information:
-          type: string
-          description: Give the model instructions about how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses. There's a 100 token limit for it, and it counts against the overall token limit.
         endpoint:
           type: string
           description: The absolute endpoint path for the Azure Search resource to use.
@@ -3172,9 +3169,6 @@ components:
           type: integer
           description: The configured strictness of the search relevance filtering. The higher of strictness, the higher of the precision but lower recall of the answer.
           format: int32
-        role_information:
-          type: string
-          description: Give the model instructions about how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses. There's a 100 token limit for it, and it counts against the overall token limit.
         database_name:
           type: string
           description: The MongoDB vCore database name to use with Azure Cosmos DB.
@@ -3271,9 +3265,6 @@ components:
           type: integer
           description: The configured strictness of the search relevance filtering. The higher of strictness, the higher of the precision but lower recall of the answer.
           format: int32
-        role_information:
-          type: string
-          description: Give the model instructions about how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses. There's a 100 token limit for it, and it counts against the overall token limit.
         endpoint:
           type: string
           description: The endpoint of Elasticsearch®.
@@ -3382,9 +3373,6 @@ components:
           type: integer
           description: The configured strictness of the search relevance filtering. The higher of strictness, the higher of the precision but lower recall of the answer.
           format: int32
-        role_information:
-          type: string
-          description: Give the model instructions about how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses. There's a 100 token limit for it, and it counts against the overall token limit.
         environment:
           type: string
           description: The environment name of Pinecone.
