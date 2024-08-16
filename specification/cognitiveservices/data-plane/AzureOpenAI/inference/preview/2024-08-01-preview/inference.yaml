@@ -3059,6 +3059,7 @@ components:
           oneOf:
             - $ref: '#/components/schemas/onYourDataEndpointVectorizationSource'
             - $ref: '#/components/schemas/onYourDataDeploymentNameVectorizationSource'
+            - $ref: '#/components/schemas/onYourDataIntegratedVectorizationSource'
         include_contexts:
           type: array
           description: The included properties of the output context. If not specified, the default value is `citations` and `intent`.
@@ -3574,6 +3575,7 @@ components:
         mapping:
           endpoint: '#/components/schemas/onYourDataEndpointVectorizationSource'
           deployment_name: '#/components/schemas/onYourDataDeploymentNameVectorizationSource'
+          integrated: '#/components/schemas/onYourDataIntegratedVectorizationSource'
           model_id: '#/components/schemas/onYourDataModelIdVectorizationSource'
     onYourDataVectorizationSourceType:
       type: string
@@ -3583,6 +3585,7 @@ components:
       enum:
         - endpoint
         - deployment_name
+        - integrated
         - model_id
       x-ms-enum:
         name: OnYourDataVectorizationSourceType
@@ -3597,6 +3600,9 @@ components:
               Represents an Ada model deployment name to use. This model deployment must be in the same Azure OpenAI resource, but
               On Your Data will use this model deployment via an internal call rather than a public one, which enables vector
               search even in private networks.
+          - name: integrated
+            value: integrated
+            description: Represents the integrated vectorizer defined within the search resource.
           - name: modelId
             value: model_id
             description: |-
@@ -3642,6 +3648,12 @@ components:
               description: The number of dimensions the embeddings should have. Only supported in `text-embedding-3` and later models.
               format: int32
       x-ms-discriminator-value: deployment_name
+    onYourDataIntegratedVectorizationSource:
+      description: |-
+        Represents the integrated vectorizer defined within the search resource.
+      allOf:
+        - $ref: '#/components/schemas/onYourDataVectorizationSource'
+      x-ms-discriminator-value: integrated
     onYourDataModelIdVectorizationSource:
       required:
         - model_id

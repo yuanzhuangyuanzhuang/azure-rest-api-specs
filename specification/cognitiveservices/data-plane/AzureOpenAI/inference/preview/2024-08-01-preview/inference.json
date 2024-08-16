@@ -4548,6 +4548,9 @@
               },
               {
                 "$ref": "#/components/schemas/onYourDataDeploymentNameVectorizationSource"
+              },
+              {
+                "$ref": "#/components/schemas/onYourDataIntegratedVectorizationSource"
               }
             ]
           },
@@ -5313,6 +5316,7 @@
           "mapping": {
             "endpoint": "#/components/schemas/onYourDataEndpointVectorizationSource",
             "deployment_name": "#/components/schemas/onYourDataDeploymentNameVectorizationSource",
+            "integrated": "#/components/schemas/onYourDataIntegratedVectorizationSource",
             "model_id": "#/components/schemas/onYourDataModelIdVectorizationSource"
           }
         }
@@ -5323,6 +5327,7 @@
         "enum": [
           "endpoint",
           "deployment_name",
+          "integrated",
           "model_id"
         ],
         "x-ms-enum": {
@@ -5338,6 +5343,11 @@
               "name": "deploymentName",
               "value": "deployment_name",
               "description": "Represents an Ada model deployment name to use. This model deployment must be in the same Azure OpenAI resource, but\nOn Your Data will use this model deployment via an internal call rather than a public one, which enables vector\nsearch even in private networks."
+            },
+            {
+              "name": "integrated",
+              "value": "integrated",
+              "description": "Represents the integrated vectorizer defined within the search resource."
             },
             {
               "name": "modelId",
@@ -5408,6 +5418,15 @@
           }
         ],
         "x-ms-discriminator-value": "deployment_name"
+      },
+      "onYourDataIntegratedVectorizationSource": {
+        "description": "Represents the integrated vectorizer defined within the search resource.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/onYourDataVectorizationSource"
+          }
+        ],
+        "x-ms-discriminator-value": "integrated"
       },
       "onYourDataModelIdVectorizationSource": {
         "required": [
