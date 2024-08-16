@@ -1,0 +1,4364 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Azure OpenAI API version 2024-08-01-preview",
+    "description": "APIs for fine-tuning and managing deployments of OpenAI models.",
+    "version": "2024-08-01-preview"
+  },
+  "paths": {
+    "/evals/dashboard/preview_file": {
+      "post": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Preview Data Source File\r\nPreview a file to be used as a data source for an eval.",
+        "operationId": "Evaluation_EvalDashboardPreview",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "evalDashboardPreviewRequest",
+            "description": "The specification of the evaluation dashboard preview request.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvalDashboardPreviewFileBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The evaluation job has been successfully canceled.",
+            "schema": {
+              "$ref": "#/definitions/FilePreviewApiObject"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Gets the input file data prior to the execution of a evaluation job.": {
+            "$ref": "./examples/post_evaluation_dashboard_preview.json"
+          }
+        }
+      }
+    },
+    "/evals/runs": {
+      "post": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Creates a run that evaluates a specified model from a given test file.\r\nThis will return a run_id and the initial status of the run.",
+        "operationId": "Evaluation_Create",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "evaluationRun",
+            "description": "The specification of the evaluation.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvalCreateRunRequestBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The evaluation job has been successfully created.",
+            "schema": {
+              "$ref": "#/definitions/RunApiObject"
+            },
+            "headers": {
+              "Location": {
+                "description": "The location of the newly created item.",
+                "type": "string",
+                "format": "url"
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Creating an evaluation job.": {
+            "$ref": "./examples/post_evaluation.json"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Gets details for a list of evaluation runs specified by a number of filters including status and time after, with a page limit option.\r\nThe details contain the run status, pipeline_config, and id.",
+        "operationId": "Evaluation_GetRuns",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Optional filter on the status of the Evaluation runs to retrieve. Default to all statuses."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of Evaluation runs to retrieve. Defaults to 20.",
+            "type": "integer",
+            "format": "int32",
+            "default": 20
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Optional filter on the creation time of Evaluation runs to retrieve.",
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/EvaluationRunList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting all evaluation job owned by this account.": {
+            "$ref": "./examples/get_list_evaluation.json"
+          }
+        }
+      }
+    },
+    "/evals/runs/{run-id}/cancel": {
+      "post": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Cancels the processing of the evaluation run specified by the given evaluation-id.",
+        "operationId": "Evaluation_Cancel",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run-id",
+            "description": "The identifier of the evaluation run.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The evaluation job has been successfully canceled",
+            "schema": {
+              "$ref": "#/definitions/RunStatusPollApiObject"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Canceling an evaluation job.": {
+            "$ref": "./examples/post_cancel_evaluation.json"
+          }
+        }
+      }
+    },
+    "/evals/runs/{run-id}/aggregation_outputs": {
+      "get": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Gets the aggregation outputs for an Evaluation run specified by the given evaluation-id.",
+        "operationId": "Evaluation_GetAggregationOutputs",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run-id",
+            "description": "The identifier of the evaluation run.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/EvalRunAggregationOutputsApiObject"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting aggregation outputs for this evaluation job.": {
+            "$ref": "./examples/get_aggregation_outputs_evaluation.json"
+          }
+        }
+      }
+    },
+    "/evals/runs/{run-id}": {
+      "get": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Gets details for a single evaluation run specified by the given evaluation-id.\r\nThe details contain the run status, pipeline_config, and id.",
+        "operationId": "Evaluation_Get",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run-id",
+            "description": "The identifier of the evaluation run.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/RunApiObject"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting an evaluation job.": {
+            "$ref": "./examples/get_evaluation.json"
+          }
+        }
+      }
+    },
+    "/evals/runs/{run-id}/status": {
+      "get": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Gets status for a single evaluation run specified by the given evaluation-id.",
+        "operationId": "Evaluation_GetStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run-id",
+            "description": "The identifier of the evaluation run.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/RunStatusPollApiObject"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting the status for an evaluation job.": {
+            "$ref": "./examples/get_status_evaluation.json"
+          }
+        }
+      }
+    },
+    "/evals/runs/{run-id}/output_data_items": {
+      "get": {
+        "tags": [
+          "Evaluation:"
+        ],
+        "summary": "Gets details for a single evaluation run specified by the given evaluation-id.\r\nThe details contain the run status, pipeline_config, and id.",
+        "operationId": "Evaluation_GetOutputDataItems",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run-id",
+            "description": "The identifier of the evaluation run.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of Evaluation runs to retrieve. Defaults to 20.",
+            "type": "integer",
+            "format": "int32",
+            "default": 20
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Optional filter on the creation time of Evaluation runs to retrieve.",
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/OutputDataItemList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting data item outputs for this evaluation job.": {
+            "$ref": "./examples/get_list_output_data_items_evaluation.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscription_id}/resourcegroups/{resourcegroup}/accounts/{accountName}/internal/files/{file-id}": {
+      "get": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Gets details for a single file specified by the given file-id.",
+        "operationId": "Files_Get_Details",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file-id",
+            "description": "The identifier of the file.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "resourcegroup",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "accountName",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/FileDetails"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting a file details.": {
+            "$ref": "./examples/get_file_details.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscription_id}/resourcegroups/{resourcegroup}/accounts/{accountName}/internal/files": {
+      "post": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Creates a new file entity by creating cosmos db entry only.",
+        "operationId": "Files_Create",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "resourcegroup",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "accountName",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "fileCreate",
+            "description": "The definition of the file to create including its purpose, the file name and the url of the file location.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FileCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The file has been successfully created.",
+            "schema": {
+              "$ref": "#/definitions/FileDetails"
+            },
+            "headers": {
+              "Location": {
+                "description": "The location of the newly created item.",
+                "type": "string",
+                "format": "url"
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Create a file with a blob url as source.": {
+            "$ref": "./examples/create_file.json"
+          }
+        }
+      }
+    },
+    "/files": {
+      "get": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Gets a list of all files owned by the Azure OpenAI resource.\r\nThese include user uploaded content like files with purpose \"fine-tune\" for training or validation of fine-tunes models\r\nas well as files that are generated by the service such as \"fine-tune-results\" which contains various metrics for the corresponding fine-tune job.",
+        "operationId": "Files_List",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "purpose",
+            "description": "Only return files with the given purpose.",
+            "type": "string",
+            "enum": [
+              "fine-tune",
+              "fine-tune-results",
+              "assistants",
+              "assistants_output"
+            ],
+            "x-ms-enum": {
+              "name": "Purpose",
+              "modelAsString": true,
+              "values": [
+                {
+                  "value": "fine-tune",
+                  "description": "This file contains training data for a fine tune job."
+                },
+                {
+                  "value": "fine-tune-results",
+                  "description": "This file contains the results of a fine tune job."
+                },
+                {
+                  "value": "assistants",
+                  "description": "This file contains data to be used in assistants."
+                },
+                {
+                  "value": "assistants_output",
+                  "description": "This file contains the results of an assistant."
+                }
+              ]
+            }
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/FileList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting all files owned by this account.": {
+            "$ref": "./examples/get_files.json"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.",
+        "operationId": "Files_Upload",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "formData",
+            "name": "purpose",
+            "description": "The intended purpose of the uploaded documents. Use \"fine-tune\" for fine-tuning. This allows us to validate the format of the uploaded file.",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "fine-tune",
+              "fine-tune-results",
+              "assistants",
+              "assistants_output"
+            ],
+            "x-ms-enum": {
+              "name": "Purpose",
+              "modelAsString": true,
+              "values": [
+                {
+                  "value": "fine-tune",
+                  "description": "This file contains training data for a fine tune job."
+                },
+                {
+                  "value": "fine-tune-results",
+                  "description": "This file contains the results of a fine tune job."
+                },
+                {
+                  "value": "assistants",
+                  "description": "This file contains data to be used in assistants."
+                },
+                {
+                  "value": "assistants_output",
+                  "description": "This file contains the results of an assistant."
+                }
+              ]
+            }
+          },
+          {
+            "in": "formData",
+            "name": "file",
+            "description": "Gets or sets the file to upload into Azure OpenAI.",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The file has been successfully created.",
+            "schema": {
+              "$ref": "#/definitions/File"
+            },
+            "headers": {
+              "Location": {
+                "description": "The location of the newly created item.",
+                "type": "string",
+                "format": "url"
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Upload a file.": {
+            "$ref": "./examples/upload_file.json"
+          }
+        }
+      }
+    },
+    "/files/{file-id}": {
+      "get": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Gets details for a single file specified by the given file-id including status, size, purpose, etc.",
+        "operationId": "Files_Get",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file-id",
+            "description": "The identifier of the file.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/File"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting a file.": {
+            "$ref": "./examples/get_file.json"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Deletes the file with the given file-id.\r\nDeletion is also allowed if a file was used, e.g., as training file in a fine-tune job.",
+        "operationId": "Files_Delete",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file-id",
+            "description": "The identifier of the file.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The file was successfully deleted."
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Deleting a file.": {
+            "$ref": "./examples/delete_file.json"
+          }
+        }
+      }
+    },
+    "/files/{file-id}/content": {
+      "get": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Gets the content of the file specified by the given file-id.\r\nFiles can be user uploaded content or generated by the service like result metrics of a fine-tune job.",
+        "operationId": "Files_GetContent",
+        "produces": [
+          "application/octet-stream",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file-id",
+            "description": "The identifier of the file.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting the file content.": {
+            "$ref": "./examples/get_file_content.json"
+          }
+        }
+      }
+    },
+    "/files/import": {
+      "post": {
+        "tags": [
+          "Files:"
+        ],
+        "summary": "Creates a new file entity by importing data from a provided url. Uploaded files can, for example, be used for training or evaluating fine-tuned models.",
+        "operationId": "Files_Import",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "fileImport",
+            "description": "The definition of the file to create including its purpose, the file name and the url of the file location.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FileImport"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The file has been successfully created.",
+            "schema": {
+              "$ref": "#/definitions/File"
+            },
+            "headers": {
+              "Location": {
+                "description": "The location of the newly created item.",
+                "type": "string",
+                "format": "url"
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Importing a file with a blob url as source.": {
+            "$ref": "./examples/import_file.json"
+          }
+        }
+      }
+    },
+    "/fine_tuning/jobs": {
+      "get": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Gets a list of all fine-tune jobs owned by the Azure OpenAI resource.\r\nThe details that are returned for each fine-tune job contain besides its identifier\r\nthe base model, training and validation files, hyper parameters, time stamps, status and events.\r\nEvents are created when the job status changes, e.g. running or complete, and when results are uploaded.",
+        "operationId": "FineTuning_List",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Identifier for the last event from the previous pagination request.",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of events to retrieve. Defaults to 20.",
+            "type": "integer",
+            "format": "int32",
+            "default": 20
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/FineTuningJobList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting all fine tuning jobs owned by this account.": {
+            "$ref": "./examples/get_finetuning_jobs.json"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Creates a job that fine-tunes a specified model from a given training file.\r\nResponse includes details of the enqueued job including job status and hyper parameters.\r\nThe name of the fine-tuned model is added to the response once complete.",
+        "operationId": "FineTuning_Create",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "fineTuningJob",
+            "description": "The specification of the fine-tuned model to create.\r\nRequired parameters are the base model and the training file to use.\r\nOptionally a validation file can be specified to compute validation metrics during training.\r\nHyper parameters will be set to default values or can be optionally specified.\r\nThese include batch size, learning rate multiplier, number of epochs and others.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FineTuningJobCreation"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The fine tune has been successfully created.",
+            "schema": {
+              "$ref": "#/definitions/FineTuningJob"
+            },
+            "headers": {
+              "Location": {
+                "description": "The location of the newly created item.",
+                "type": "string",
+                "format": "url"
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Creating a fine tuning job.": {
+            "$ref": "./examples/post_finetuning_job.json"
+          }
+        }
+      }
+    },
+    "/fine_tuning/jobs/{fine-tuning-job-id}": {
+      "get": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Gets details for a single fine-tune job specified by the given fine-tune-id.\r\nThe details contain the base model, training and validation files, hyper parameters, time stamps, status and events.\r\nEvents are created when the job status changes, e.g. running or complete, and when results are uploaded.",
+        "operationId": "FineTuning_Get",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fine-tuning-job-id",
+            "description": "The identifier of the fine-tune job.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/FineTuningJob"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting a fine tuning job.": {
+            "$ref": "./examples/get_finetuning_job.json"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Deletes the fine-tune job specified by the given fine-tune-id.",
+        "operationId": "FineTuning_Delete",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fine-tuning-job-id",
+            "description": "The identifier of the fine-tune job.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The fine tune was successfully deleted."
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Deleting a fine tuning job.": {
+            "$ref": "./examples/delete_finetuning_job.json"
+          }
+        }
+      }
+    },
+    "/fine_tuning/jobs/{fine-tuning-job-id}/events": {
+      "get": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Gets the events for the fine-tune job specified by the given fine-tune-id.\r\nEvents are created when the job status changes, e.g. running or complete, and when results are uploaded.",
+        "operationId": "FineTuning_GetEvents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fine-tuning-job-id",
+            "description": "The identifier of the fine-tune job.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Identifier for the last event from the previous pagination request.",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of events to retrieve. Defaults to 20.",
+            "type": "integer",
+            "format": "int32",
+            "default": 20
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/FineTuningJobEventList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting events of a fine tuning job.": {
+            "$ref": "./examples/get_finetuning_job_events.json"
+          }
+        }
+      }
+    },
+    "/fine_tuning/jobs/{fine-tuning-job-id}/checkpoints": {
+      "get": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Gets the checkpoints for the fine-tune job specified by the given fine-tune-id.\r\nCheckpoints are created at the end of successful epochs during training.",
+        "operationId": "FineTuning_GetCheckpoints",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fine-tuning-job-id",
+            "description": "The identifier of the fine-tune job.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "description": "Identifier for the last checkpoint ID from the previous pagination request.",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of checkpoints to retrieve. Defaults to 10.",
+            "type": "integer",
+            "format": "int32",
+            "default": 10
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/FineTuningJobCheckpointList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting checkpoints of a fine tuning job.": {
+            "$ref": "./examples/get_finetuning_job_checkpoints.json"
+          }
+        }
+      }
+    },
+    "/fine_tuning/jobs/{fine-tuning-job-id}/cancel": {
+      "post": {
+        "tags": [
+          "Fine-tuning:"
+        ],
+        "summary": "Cancels the processing of the fine-tune job specified by the given fine-tune-id.",
+        "operationId": "FineTuning_Cancel",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fine-tuning-job-id",
+            "description": "The identifier of the fine-tune job.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The fine tune has been successfully canceled",
+            "schema": {
+              "$ref": "#/definitions/FineTuningJob"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Canceling a fine tuning job.": {
+            "$ref": "./examples/cancel_finetuning_job.json"
+          }
+        }
+      }
+    },
+    "/models": {
+      "get": {
+        "tags": [
+          "Models:"
+        ],
+        "summary": "Gets a list of all models that are accessible by the Azure OpenAI resource.\r\nThese include base models as well as all successfully completed fine-tuned models owned by the Azure OpenAI resource.",
+        "operationId": "Models_List",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ModelList"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting all models owned by account.": {
+            "$ref": "./examples/get_models.json"
+          }
+        }
+      }
+    },
+    "/models/{model-id}": {
+      "get": {
+        "tags": [
+          "Models:"
+        ],
+        "summary": "Gets details for the model specified by the given modelId.",
+        "operationId": "Models_Get",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model-id",
+            "description": "The identifier of the model.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Model"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Getting a base model.": {
+            "$ref": "./examples/get_model_base.json"
+          },
+          "Getting a fine-tuned model.": {
+            "$ref": "./examples/get_model_finetune.json"
+          }
+        }
+      }
+    },
+    "/uploads": {
+      "post": {
+        "tags": [
+          "UploadFile:"
+        ],
+        "summary": "Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.",
+        "operationId": "Upload_File_Start",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "requestBody",
+            "description": "The definition of the file to create including its purpose and the location on the local machine.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UploadFileStartBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The upload has been successfully created.",
+            "schema": {
+              "$ref": "#/definitions/UploadResource"
+            },
+            "headers": {
+              "Location": {
+                "description": "The location of the newly created item.",
+                "type": "string",
+                "format": "url"
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Start a large file upload operation.": {
+            "$ref": "./examples/upload_file_start.json"
+          }
+        }
+      }
+    },
+    "/uploads/{upload-id}/parts": {
+      "post": {
+        "tags": [
+          "UploadFile:"
+        ],
+        "summary": "Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.",
+        "operationId": "Upload_File_Part",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "upload-id",
+            "description": "The identifier of the upload.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "formData",
+            "name": "data",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/UploadPartResource"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Upload a part of large file upload operation.": {
+            "$ref": "./examples/upload_file_part.json"
+          }
+        }
+      }
+    },
+    "/uploads/{upload-id}/complete": {
+      "post": {
+        "tags": [
+          "UploadFile:"
+        ],
+        "summary": "Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.",
+        "operationId": "Upload_File_Complete",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "upload-id",
+            "description": "The identifier of the upload.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          },
+          {
+            "in": "body",
+            "name": "requestBody",
+            "description": "The definition of the file to create including its purpose and the location on the local machine.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UploadFileCompleteBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/UploadResource"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Complete and validate a large file upload operation.": {
+            "$ref": "./examples/upload_file_complete.json"
+          }
+        }
+      }
+    },
+    "/uploads/{upload-id}/cancel": {
+      "post": {
+        "tags": [
+          "UploadFile:"
+        ],
+        "summary": "Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.",
+        "operationId": "Upload_File_Cancel",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "upload-id",
+            "description": "The identifier of the upload.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/apiVersionQueryParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/UploadResource"
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Cancel a large file upload operation.": {
+            "$ref": "./examples/upload_file_cancel.json"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AggregationResult": {
+      "title": "AggregationResult",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "identifier": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "data": {
+          "readOnly": true
+        }
+      }
+    },
+    "AggregationResultList": {
+      "title": "AggregationResultList",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AggregationResult"
+          }
+        },
+        "has_more": {
+          "description": "A value indicating whether the list contains more elements than returned.",
+          "type": "boolean"
+        }
+      },
+      "readOnly": true
+    },
+    "AggregatorConfig": {
+      "title": "AggregatorConfig",
+      "required": [
+        "name",
+        "target",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/AggregatorType"
+        },
+        "target": {
+          "$ref": "#/definitions/VariableReferenceExpressionConfig"
+        }
+      }
+    },
+    "AggregatorType": {
+      "title": "AggregatorType",
+      "description": "Defines the types of Aggregators.",
+      "enum": [
+        "mean",
+        "sum"
+      ],
+      "type": "string"
+    },
+    "BaseEvalRunStats": {
+      "title": "BaseEvalRunStats",
+      "description": "Defines the values of a evaluation job.",
+      "type": "object",
+      "properties": {
+        "num_data_source_items": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "num_samples": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "BaseRunApiObject": {
+      "title": "BaseRunApiObject",
+      "required": [
+        "run_type",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "org_id": {
+          "description": "The organisation id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.",
+          "type": "string"
+        },
+        "run_type": {
+          "$ref": "#/definitions/RunType"
+        },
+        "status": {
+          "title": "EvalRunStatus",
+          "description": "The status of this run or item.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/EvalRunStatusValidating"
+            }
+          ]
+        },
+        "evaluated_model_name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "aggregation_outputs": {
+          "$ref": "#/definitions/AggregationResultList"
+        },
+        "aggregation_file_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "output_data_fileId": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "BleuScoreGraderConfig": {
+      "title": "BleuScoreGraderConfig",
+      "required": [
+        "hypothesis",
+        "reference",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "hypothesis": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        }
+      }
+    },
+    "Capabilities": {
+      "title": "Capabilities",
+      "description": "The capabilities of a base or fine tune model.",
+      "required": [
+        "chat_completion",
+        "completion",
+        "embeddings",
+        "fine_tune",
+        "inference"
+      ],
+      "type": "object",
+      "properties": {
+        "fine_tune": {
+          "description": "A value indicating whether a model can be used for fine tuning.",
+          "type": "boolean"
+        },
+        "inference": {
+          "description": "A value indicating whether a model can be deployed.",
+          "type": "boolean"
+        },
+        "completion": {
+          "description": "A value indicating whether a model supports completion.",
+          "type": "boolean"
+        },
+        "chat_completion": {
+          "description": "A value indicating whether a model supports chat completion.",
+          "type": "boolean"
+        },
+        "embeddings": {
+          "description": "A value indicating whether a model supports embeddings.",
+          "type": "boolean"
+        }
+      }
+    },
+    "ChatCriteriaModelGraderConfig": {
+      "title": "ChatCriteriaModelGraderConfig",
+      "required": [
+        "conversation",
+        "criteria",
+        "false_grade",
+        "model_name",
+        "response",
+        "true_grade",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/GraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "model_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "conversation": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "response": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "criteria": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "true_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "false_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "required": [
+        "content",
+        "role"
+      ],
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/ChatMessageRole"
+        },
+        "content": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "ChatMessageRole": {
+      "title": "ChatMessageRole",
+      "enum": [
+        "system",
+        "user",
+        "assistant"
+      ],
+      "type": "string"
+    },
+    "ClosedQAModelGraderConfig": {
+      "title": "ClosedQAModelGraderConfig",
+      "required": [
+        "criterion",
+        "false_grade",
+        "model_name",
+        "submission",
+        "task",
+        "true_grade",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/GraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "model_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "task": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "submission": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "criterion": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "true_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "false_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "ConstantExpressionConfig": {
+      "title": "ConstantExpressionConfig",
+      "required": [
+        "type",
+        "value"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ExpressionConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": { }
+      }
+    },
+    "ConstantGraderConfig": {
+      "title": "ConstantGraderConfig",
+      "required": [
+        "output_grade",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "output_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "DataSourceConfig": {
+      "title": "DataSourceConfig",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "discriminator": "type"
+    },
+    "DataSourceConfigFileType": {
+      "title": "DataSourceConfigFileType",
+      "description": "The type of a file.",
+      "enum": [
+        "jsonl"
+      ],
+      "type": "string"
+    },
+    "DataSourceItemSchema": {
+      "title": "DataSourceItemSchema",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DataSourceSchemaField"
+          }
+        }
+      }
+    },
+    "DataSourceSchemaField": {
+      "title": "DataSourceSchemaField",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/DataSourceSchemaFieldType"
+        }
+      }
+    },
+    "DataSourceSchemaFieldType": {
+      "title": "DataSourceSchemaFieldType",
+      "enum": [
+        "string",
+        "number",
+        "boolean",
+        "object",
+        "array"
+      ],
+      "type": "string"
+    },
+    "Deprecation": {
+      "title": "Deprecation",
+      "description": "Defines the dates of deprecation for the different use cases of a model.\r\nUsually base models support 1 year of fine tuning after creation. Inference is typically supported 2 years after creation of base or\r\nfine tuned models. The exact dates are specified in the properties.",
+      "required": [
+        "inference"
+      ],
+      "type": "object",
+      "properties": {
+        "fine_tune": {
+          "format": "unixtime",
+          "description": "The end date of fine tune support of this model. Will be `null` for fine tune models.",
+          "type": "integer"
+        },
+        "inference": {
+          "format": "unixtime",
+          "description": "The end date of inference support of this model.",
+          "type": "integer"
+        }
+      }
+    },
+    "DiscreteClassificationModelGraderConfig": {
+      "title": "DiscreteClassificationModelGraderConfig",
+      "required": [
+        "invalid_grade",
+        "labels",
+        "model_name",
+        "prompt",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/GraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "model_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "prompt": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "invalid_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "labels": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DiscreteClassificationModelGraderLabelConfig"
+          }
+        }
+      }
+    },
+    "DiscreteClassificationModelGraderLabelConfig": {
+      "title": "DiscreteClassificationModelGraderLabelConfig",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "Error": {
+      "title": "Error",
+      "description": "Error content as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses).",
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/ErrorCode"
+        },
+        "message": {
+          "description": "The message of this error.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "target": {
+          "description": "The location where the error happened if available.",
+          "type": "string"
+        },
+        "details": {
+          "description": "The error details if available.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Error"
+          }
+        },
+        "innererror": {
+          "$ref": "#/definitions/InnerError"
+        }
+      }
+    },
+    "ErrorCode": {
+      "title": "ErrorCode",
+      "description": "Error codes as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses).",
+      "enum": [
+        "conflict",
+        "invalidPayload",
+        "forbidden",
+        "notFound",
+        "unexpectedEntityState",
+        "itemDoesAlreadyExist",
+        "serviceUnavailable",
+        "internalFailure",
+        "quotaExceeded",
+        "jsonlValidationFailed",
+        "fileImportFailed"
+      ],
+      "type": "string",
+      "x-ms-enum": {
+        "name": "ErrorCode",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "conflict",
+            "description": "The requested operation conflicts with the current resource state."
+          },
+          {
+            "value": "invalidPayload",
+            "description": "The request data is invalid for this operation."
+          },
+          {
+            "value": "forbidden",
+            "description": "The operation is forbidden for the current user/api key."
+          },
+          {
+            "value": "notFound",
+            "description": "The resource is not found."
+          },
+          {
+            "value": "unexpectedEntityState",
+            "description": "The operation cannot be executed in the current resource's state."
+          },
+          {
+            "value": "itemDoesAlreadyExist",
+            "description": "The item does already exist."
+          },
+          {
+            "value": "serviceUnavailable",
+            "description": "The service is currently not available."
+          },
+          {
+            "value": "internalFailure",
+            "description": "Internal error. Please retry."
+          },
+          {
+            "value": "quotaExceeded",
+            "description": "Quota exceeded."
+          },
+          {
+            "value": "jsonlValidationFailed",
+            "description": "Validation of jsonl data failed."
+          },
+          {
+            "value": "fileImportFailed",
+            "description": "Import of file failed."
+          }
+        ]
+      }
+    },
+    "ErrorResponse": {
+      "title": "ErrorResponse",
+      "description": "Error response as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses).",
+      "required": [
+        "error"
+      ],
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "EvalCreateRunRequestBody": {
+      "title": "EvalCreateRunRequestBody",
+      "description": "Defines the values of an evaluation job.",
+      "required": [
+        "pipeline_config",
+        "run_type"
+      ],
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "description": "Display name for the run.",
+          "type": "string"
+        },
+        "run_type": {
+          "$ref": "#/definitions/RunType"
+        },
+        "pipeline_config": {
+          "$ref": "#/definitions/PipelineConfig"
+        }
+      }
+    },
+    "EvalDashboardPreviewFileBody": {
+      "title": "EvalDashboardPreviewFileBody",
+      "description": "Defines the values of an evaluation job.",
+      "required": [
+        "file_id"
+      ],
+      "type": "object",
+      "properties": {
+        "file_id": {
+          "description": "Display name for the run.",
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "EvalRunAggregationOutputsApiObject": {
+      "title": "EvalRunAggregationOutputsApiObject",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "run_id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "aggregation_outputs": {
+          "$ref": "#/definitions/AggregationResultList"
+        }
+      }
+    },
+    "EvalRunStatus": {
+      "title": "EvalRunStatus",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "discriminator": "type"
+    },
+    "EvalRunStatusFailed": {
+      "title": "EvalRunStatusFailed",
+      "required": [
+        "failure_user_message",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/EvalRunStatus"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/definitions/FailureReason"
+        },
+        "failure_user_message": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "EvalRunStatusRunning": {
+      "title": "EvalRunStatusRunning",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/EvalRunStatus"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "approximate_percentage_complete": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "EvalRunStatusSucceeded": {
+      "title": "EvalRunStatusSucceeded",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/EvalRunStatus"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "EvalRunStatusValidating": {
+      "title": "EvalRunStatusValidating",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/EvalRunStatus"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "EvalRunStatusWaiting": {
+      "title": "EvalRunStatusWaiting",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/EvalRunStatus"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "approximate_start_time": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "EvaluationRunList": {
+      "title": "EvaluationRunList",
+      "description": "Represents a list of fine tunes.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BaseRunApiObject"
+          }
+        },
+        "has_more": {
+          "description": "A value indicating whether the list contains more elements than returned.",
+          "type": "boolean"
+        }
+      }
+    },
+    "EventType": {
+      "title": "EventType",
+      "description": "Defines the severity of a content filter result.",
+      "enum": [
+        "message",
+        "metrics"
+      ],
+      "type": "string",
+      "x-ms-enum": {
+        "name": "EventType",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "message",
+            "description": "Event only contains human readable messages."
+          },
+          {
+            "value": "metrics",
+            "description": "Event contains metrics."
+          }
+        ]
+      }
+    },
+    "ExpressionConfig": {
+      "title": "ExpressionConfig",
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "discriminator": "type"
+    },
+    "FactualityModelGraderConfig": {
+      "title": "FactualityModelGraderConfig",
+      "required": [
+        "agreement_grade",
+        "differ_but_factual_agreement_grade",
+        "disagreement_grade",
+        "model_name",
+        "question",
+        "reference",
+        "submission",
+        "subset_grade",
+        "superset_grade",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/GraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "model_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "question": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "reference": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "submission": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "subset_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "superset_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "agreement_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "disagreement_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "differ_but_factual_agreement_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "FailureReason": {
+      "title": "FailureReason",
+      "enum": [
+        "user_cancelled",
+        "internal_error"
+      ],
+      "type": "string"
+    },
+    "File": {
+      "title": "File",
+      "description": "A file is a document usable for training and validation. It can also be a service generated document with result details.",
+      "required": [
+        "filename",
+        "purpose"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "bytes": {
+          "format": "int64",
+          "description": "The size of this file when available (can be null). File sizes larger than 2^53-1 are not supported to ensure compatibility\r\nwith JavaScript integers.",
+          "type": "integer",
+          "readOnly": true
+        },
+        "purpose": {
+          "$ref": "#/definitions/Purpose"
+        },
+        "filename": {
+          "description": "The name of the file.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "readOnly": true
+    },
+    "FileCreate": {
+      "title": "FileCreate",
+      "description": "Defines a document to import from an external content url to be usable with Azure OpenAI.",
+      "required": [
+        "content_url",
+        "purpose"
+      ],
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "$ref": "#/definitions/Purpose"
+        },
+        "content_url": {
+          "format": "url",
+          "description": "The url to download the document from (can be SAS url of a blob or any other external url accessible with a GET request).",
+          "type": "string"
+        }
+      }
+    },
+    "FileDetails": {
+      "title": "FileDetails",
+      "description": "A file detail is a document used by batch service to fetch file blob details.",
+      "required": [
+        "filename",
+        "purpose"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "filename": {
+          "description": "The name of the file.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "path": {
+          "description": "The  the relative path to the file within the container.",
+          "type": "string",
+          "readOnly": true
+        },
+        "storage_account_uri": {
+          "format": "url",
+          "description": "The storage account url of this file.",
+          "type": "string",
+          "readOnly": true
+        },
+        "storage_container_name": {
+          "description": "The Storage Container Name of this file blob.",
+          "type": "string",
+          "readOnly": true
+        },
+        "purpose": {
+          "$ref": "#/definitions/Purpose"
+        }
+      }
+    },
+    "FileImport": {
+      "title": "FileImport",
+      "description": "Defines a document to import from an external content url to be usable with Azure OpenAI.",
+      "required": [
+        "content_url",
+        "filename",
+        "purpose"
+      ],
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "$ref": "#/definitions/Purpose"
+        },
+        "filename": {
+          "description": "The name of the [JSON Lines](https://jsonlines.readthedocs.io/en/latest/) file to be uploaded.\r\nIf the `purpose` is set to \"fine-tune\", each line is a JSON record with \"prompt\" and \"completion\" fields representing your training examples.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "content_url": {
+          "format": "url",
+          "description": "The url to download the document from (can be SAS url of a blob or any other external url accessible with a GET request).",
+          "type": "string"
+        }
+      }
+    },
+    "FileList": {
+      "title": "FileList",
+      "description": "Represents a list of files.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/File"
+          }
+        }
+      }
+    },
+    "FilePreviewApiObject": {
+      "title": "FilePreviewApiObject",
+      "required": [
+        "file_id"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "file_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "preview": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "title": "IDictionary`2",
+            "type": "object",
+            "additionalProperties": { }
+          }
+        },
+        "item_schema": {
+          "$ref": "#/definitions/DataSourceItemSchema"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "FileServiceDataSourceConfig": {
+      "title": "FileServiceDataSourceConfig",
+      "required": [
+        "file_id",
+        "file_type",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataSourceConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "file_type": {
+          "$ref": "#/definitions/DataSourceConfigFileType"
+        },
+        "file_id": {
+          "description": "The file id.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "max_items": {
+          "format": "int32",
+          "description": "The type of file.",
+          "type": "integer"
+        }
+      }
+    },
+    "FineTuningHyperParameters": {
+      "title": "FineTuningHyperParameters",
+      "description": "The hyper parameter settings used in a fine tune job.",
+      "type": "object",
+      "properties": {
+        "n_epochs": {
+          "format": "int32",
+          "description": "The number of epochs to train the model for. An epoch refers to one full cycle through the training dataset.",
+          "type": "integer"
+        },
+        "batch_size": {
+          "format": "int32",
+          "description": "The batch size to use for training. The batch size is the number of training examples used to train a single forward and backward pass.\r\nIn general, we've found that larger batch sizes tend to work better for larger datasets.\r\nThe default value as well as the maximum value for this property are specific to a base model.",
+          "type": "integer"
+        },
+        "learning_rate_multiplier": {
+          "format": "double",
+          "description": "The learning rate multiplier to use for training. The fine-tuning learning rate is the original learning rate used for pre-training multiplied by this value.\r\nLarger learning rates tend to perform better with larger batch sizes.\r\nWe recommend experimenting with values in the range 0.02 to 0.2 to see what produces the best results.",
+          "type": "number"
+        }
+      }
+    },
+    "FineTuningJob": {
+      "title": "FineTuningJob",
+      "description": "Defines the values of a fine tune job.",
+      "required": [
+        "model",
+        "training_file"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "status": {
+          "$ref": "#/definitions/FineTuningState"
+        },
+        "model": {
+          "description": "The identifier (model-id) of the base model used for the fine-tune.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "fine_tuned_model": {
+          "description": "The identifier (model-id) of the resulting fine tuned model. This property is only populated for successfully completed fine-tune runs.\r\nUse this identifier to create a deployment for inferencing.",
+          "type": "string"
+        },
+        "training_file": {
+          "description": "The file which is used for training.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "validation_file": {
+          "description": "The file which is used to evaluate the fine tuned model during training.",
+          "type": "string"
+        },
+        "result_files": {
+          "description": "The result file identities (file-id) containing training and evaluation metrics in csv format.\r\nThe file is only available for successfully completed fine-tune runs.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "finished_at": {
+          "format": "int32",
+          "description": "A timestamp when this job or item has finished successfully (in unix epochs).",
+          "type": "integer"
+        },
+        "organisation_id": {
+          "description": "The organisation id of this fine tune job. Unused on Azure OpenAI; compatibility for OpenAI only.",
+          "type": "string"
+        },
+        "trained_tokens": {
+          "format": "int32",
+          "description": "The total number of billable tokens processed by this fine tuning job.",
+          "type": "integer",
+          "readOnly": true
+        },
+        "error": {
+          "$ref": "#/definitions/FineTuningJobError"
+        },
+        "estimated_finish": {
+          "format": "int32",
+          "description": "The Unix timestamp (in seconds) for when the fine-tuning job is estimated to finish. The value will be null if the fine-tuning job is not running.",
+          "type": "integer"
+        },
+        "hyperparameters": {
+          "$ref": "#/definitions/FineTuningHyperParameters"
+        },
+        "suffix": {
+          "description": "The suffix used to identify the fine-tuned model. The suffix can contain up to 40 characters (a-z, A-Z, 0-9,- and _) that will be added to your fine-tuned model name.",
+          "type": "string"
+        },
+        "seed": {
+          "format": "int32",
+          "description": "The seed used for the finetuning job.",
+          "type": "integer"
+        }
+      }
+    },
+    "FineTuningJobCheckpoint": {
+      "title": "FineTuningJobCheckpoint",
+      "required": [
+        "created_at",
+        "fine_tuned_model_checkpoint",
+        "fine_tuning_job_id",
+        "metrics",
+        "step_number"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "id": {
+          "description": "The identity of this checkpoint.",
+          "type": "string",
+          "readOnly": true
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "The Unix timestamp (in seconds) for when the checkpoint was created.",
+          "type": "integer"
+        },
+        "fine_tuned_model_checkpoint": {
+          "description": "The name of the fine-tuned checkpoint model that is created.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "step_number": {
+          "format": "int32",
+          "description": "The step number that the checkpoint was created at.",
+          "type": "integer"
+        },
+        "metrics": {
+          "title": "Dictionary`2",
+          "description": "The metrics at the step number during the fine-tuning job.",
+          "type": "object",
+          "additionalProperties": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "fine_tuning_job_id": {
+          "description": "The name of the fine-tuning job that this checkpoint was created from..",
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "FineTuningJobCheckpointList": {
+      "title": "FineTuningJobCheckpointList",
+      "description": "Represents a list of checkpoints.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FineTuningJobCheckpoint"
+          }
+        },
+        "has_more": {
+          "description": "A value indicating whether the list contains more elements than returned.",
+          "type": "boolean"
+        }
+      }
+    },
+    "FineTuningJobCreation": {
+      "title": "FineTuningJobCreation",
+      "description": "Defines the values of a fine tune job.",
+      "required": [
+        "model",
+        "training_file"
+      ],
+      "type": "object",
+      "properties": {
+        "model": {
+          "description": "The identifier (model-id) of the base model used for this fine-tune.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "training_file": {
+          "description": "The file identity (file-id) that is used for training this fine tuned model.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "validation_file": {
+          "description": "The file identity (file-id) that is used to evaluate the fine tuned model during training.",
+          "type": "string"
+        },
+        "hyperparameters": {
+          "$ref": "#/definitions/FineTuningHyperParameters"
+        },
+        "suffix": {
+          "description": "The suffix used to identify the fine-tuned model. The suffix can contain up to 40 characters (a-z, A-Z, 0-9,- and _) that will be added to your fine-tuned model name.",
+          "type": "string"
+        },
+        "seed": {
+          "format": "int32",
+          "description": "The seed used for the finetuning job. Passing in the same seed and job parameters should produce the same results, but may differ in rare cases. If a seed is not specified, one will be generated for you.",
+          "type": "integer"
+        }
+      }
+    },
+    "FineTuningJobError": {
+      "title": "FineTuningJobError",
+      "description": "For fine-tuning jobs that have failed, this will contain more information on the cause of the failure.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "The machine-readable error code..",
+          "type": "string"
+        },
+        "message": {
+          "description": "The human-readable error message.",
+          "type": "string"
+        },
+        "param": {
+          "description": "The parameter that was invalid, usually training_file or validation_file. This field will be null if the failure was not parameter-specific.",
+          "type": "string"
+        }
+      }
+    },
+    "FineTuningJobEvent": {
+      "title": "FineTuningJobEvent",
+      "required": [
+        "created_at",
+        "level",
+        "message",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "id": {
+          "description": "The identity of this event.",
+          "type": "string",
+          "readOnly": true
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this event was created (in unix epochs).",
+          "type": "integer"
+        },
+        "level": {
+          "$ref": "#/definitions/LogLevel"
+        },
+        "message": {
+          "description": "The message describing the event. This can be a change of state, e.g., enqueued, started, failed or completed, or other events like uploaded results.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/EventType"
+        },
+        "data": {
+          "description": "Machine readable data of this event."
+        }
+      }
+    },
+    "FineTuningJobEventList": {
+      "title": "FineTuningJobEventList",
+      "description": "Represents a list of events.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FineTuningJobEvent"
+          }
+        },
+        "has_more": {
+          "description": "A value indicating whether the list contains more elements than returned.",
+          "type": "boolean"
+        }
+      }
+    },
+    "FineTuningJobList": {
+      "title": "FineTuningJobList",
+      "description": "Represents a list of fine tunes.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FineTuningJob"
+          }
+        },
+        "has_more": {
+          "description": "A value indicating whether the list contains more elements than returned.",
+          "type": "boolean"
+        }
+      }
+    },
+    "FineTuningState": {
+      "title": "FineTuningState",
+      "description": "The state of a finetunes object or fine tuning job.",
+      "enum": [
+        "created",
+        "pending",
+        "running",
+        "succeeded",
+        "cancelled",
+        "failed"
+      ],
+      "type": "string",
+      "readOnly": true,
+      "x-ms-enum": {
+        "name": "FineTuningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "created",
+            "description": "The operation was created. This state is not returned by Azure OpenAI and exposed only for compatibility. It can be categorized as an inactive state."
+          },
+          {
+            "value": "pending",
+            "description": "The operation is not yet queued to be processed in the future. It can be categorized as an inactive state."
+          },
+          {
+            "value": "running",
+            "description": "The operation has started to be processed. It can be categorized as an active state."
+          },
+          {
+            "value": "succeeded",
+            "description": "The operation has successfully be processed and is ready for consumption. It can be categorized as a terminal state."
+          },
+          {
+            "value": "cancelled",
+            "description": "The operation has been cancelled and is incomplete. It can be categorized as a terminal state."
+          },
+          {
+            "value": "failed",
+            "description": "The operation has completed processing with a failure and cannot be further consumed. It can be categorized as a terminal state."
+          }
+        ]
+      }
+    },
+    "GleuScoreGraderConfig": {
+      "title": "GleuScoreGraderConfig",
+      "required": [
+        "hypothesis",
+        "reference",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "hypothesis": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        }
+      }
+    },
+    "GraderConfig": {
+      "title": "GraderConfig",
+      "required": [
+        "name",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "discriminator": "type"
+    },
+    "InnerError": {
+      "title": "InnerError",
+      "description": "Inner error as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses).",
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/definitions/InnerErrorCode"
+        },
+        "innererror": {
+          "$ref": "#/definitions/InnerError"
+        }
+      }
+    },
+    "InnerErrorCode": {
+      "title": "InnerErrorCode",
+      "description": "Inner error codes as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses).",
+      "enum": [
+        "invalidPayload"
+      ],
+      "type": "string",
+      "x-ms-enum": {
+        "name": "InnerErrorCode",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "invalidPayload",
+            "description": "The request data is invalid for this operation."
+          }
+        ]
+      }
+    },
+    "LifeCycleStatus": {
+      "title": "LifeCycleStatus",
+      "description": "The life cycle status of a model.\r\nNote: A model can be promoted from \"preview\" to \"generally-available\", but never from \"generally-available\" to \"preview\".",
+      "enum": [
+        "preview",
+        "generally-available"
+      ],
+      "type": "string",
+      "x-ms-enum": {
+        "name": "LifeCycleStatus",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "preview",
+            "description": "Model is in preview and covered by the service preview terms."
+          },
+          {
+            "value": "generally-available",
+            "description": "Model is generally available."
+          }
+        ]
+      }
+    },
+    "LogLevel": {
+      "title": "LogLevel",
+      "description": "The verbosity level of an event.",
+      "enum": [
+        "info",
+        "warning",
+        "error"
+      ],
+      "type": "string",
+      "x-ms-enum": {
+        "name": "LogLevel",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "info",
+            "description": "This event is for information only."
+          },
+          {
+            "value": "warning",
+            "description": "This event represents a mitigated issue."
+          },
+          {
+            "value": "error",
+            "description": "This message represents a non recoverable issue."
+          }
+        ]
+      }
+    },
+    "MeteorScoreGraderConfig": {
+      "title": "MeteorScoreGraderConfig",
+      "required": [
+        "hypothesis",
+        "reference",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "hypothesis": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        }
+      }
+    },
+    "Model": {
+      "title": "Model",
+      "description": "A model is either a base model or the result of a successful fine tune job.",
+      "required": [
+        "capabilities",
+        "deprecation",
+        "lifecycle_status"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "status": {
+          "$ref": "#/definitions/FineTuningState"
+        },
+        "model": {
+          "description": "The base model identity (model-id) if this is a fine tune model; otherwise `null`.",
+          "type": "string"
+        },
+        "fine_tune": {
+          "description": "The fine tune job identity (fine-tune-id) if this is a fine tune model; otherwise `null`.",
+          "type": "string"
+        },
+        "capabilities": {
+          "$ref": "#/definitions/Capabilities"
+        },
+        "lifecycle_status": {
+          "$ref": "#/definitions/LifeCycleStatus"
+        },
+        "deprecation": {
+          "$ref": "#/definitions/Deprecation"
+        }
+      }
+    },
+    "ModelGraderConfig": {
+      "title": "ModelGraderConfig",
+      "required": [
+        "model_name",
+        "output_graders",
+        "sampling_params",
+        "trajectory_template",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/GraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "trajectory_template": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessage"
+          }
+        },
+        "model_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sampling_params": {
+          "$ref": "#/definitions/ModelSamplingParams"
+        },
+        "output_graders": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "title": "GraderConfig",
+            "allOf": [
+              {
+                "$ref": "#/definitions/SetMembershipGraderConfig"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "ModelList": {
+      "title": "ModelList",
+      "description": "Represents a list of models.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Model"
+          }
+        }
+      }
+    },
+    "ModelSamplingParams": {
+      "title": "ModelSamplingParams",
+      "required": [
+        "max_tokens",
+        "temperature"
+      ],
+      "type": "object",
+      "properties": {
+        "seed": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "temperature": {
+          "format": "float",
+          "type": "number"
+        },
+        "max_tokens": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "top_p": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "ModelUsage": {
+      "title": "ModelUsage",
+      "type": "object",
+      "properties": {
+        "model_config": {
+          "title": "IDictionary`2",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "model_name": {
+          "type": "string"
+        },
+        "invocation_count": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "prompt_tokens": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "completion_tokens": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "total_tokens": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "MulticlassClassificationGraderConfig": {
+      "title": "MulticlassClassificationGraderConfig",
+      "required": [
+        "case_sensitive",
+        "hypothesis_set",
+        "reference_set",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference_set": {
+          "$ref": "#/definitions/StringDelimitedSetExpressionConfig"
+        },
+        "hypothesis_set": {
+          "$ref": "#/definitions/StringDelimitedSetExpressionConfig"
+        },
+        "case_sensitive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "NonModelGraderConfig": {
+      "title": "NonModelGraderConfig",
+      "required": [
+        "name",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "discriminator": "type"
+    },
+    "OutputDataItemApiObject": {
+      "title": "OutputDataItemApiObject",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "run_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "data_source_idx": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "item": {
+          "title": "IDictionary`2",
+          "type": "object",
+          "additionalProperties": { },
+          "readOnly": true
+        },
+        "sample": {
+          "$ref": "#/definitions/Sample"
+        },
+        "grades": {
+          "title": "IDictionary`2",
+          "type": "object",
+          "additionalProperties": {
+            "format": "float",
+            "type": "number"
+          },
+          "readOnly": true
+        },
+        "grader_samples": {
+          "title": "IDictionary`2",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Sample"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "OutputDataItemList": {
+      "title": "OutputDataItemList",
+      "description": "Represents a list of fine tunes.",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "data": {
+          "description": "The list of items.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OutputDataItemApiObject"
+          }
+        },
+        "has_more": {
+          "description": "A value indicating whether the list contains more elements than returned.",
+          "type": "boolean"
+        }
+      }
+    },
+    "OutputEvalRunStats": {
+      "title": "OutputEvalRunStats",
+      "description": "Defines the values of a evaluation job.",
+      "type": "object",
+      "properties": {
+        "num_data_source_items": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "num_samples": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "num_errors": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "per_model_usage": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelUsage"
+          }
+        }
+      }
+    },
+    "PipelineConfig": {
+      "title": "PipelineConfig",
+      "required": [
+        "aggregators",
+        "data_source",
+        "graders",
+        "sample_generator"
+      ],
+      "type": "object",
+      "properties": {
+        "data_source": {
+          "title": "DataSourceConfig",
+          "description": "The data source. For now its a file-id, but needs to be changed to OpenAI data source.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/FileServiceDataSourceConfig"
+            }
+          ]
+        },
+        "sample_generator": {
+          "$ref": "#/definitions/SampleGeneratorConfig"
+        },
+        "graders": {
+          "title": "IList`1",
+          "description": "The list of graders.",
+          "type": "array",
+          "items": {
+            "title": "GraderConfig",
+            "allOf": [
+              {
+                "$ref": "#/definitions/SetMembershipGraderConfig"
+              }
+            ]
+          }
+        },
+        "aggregators": {
+          "title": "IList`1",
+          "description": "The list of aggregators.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AggregatorConfig"
+          }
+        }
+      }
+    },
+    "Purpose": {
+      "title": "Purpose",
+      "description": "The intended purpose of the uploaded documents. Use \"fine-tune\" for fine-tuning. This allows us to validate the format of the uploaded file.",
+      "enum": [
+        "fine-tune",
+        "fine-tune-results",
+        "assistants",
+        "assistants_output"
+      ],
+      "type": "string",
+      "readOnly": true,
+      "x-ms-enum": {
+        "name": "Purpose",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "fine-tune",
+            "description": "This file contains training data for a fine tune job."
+          },
+          {
+            "value": "fine-tune-results",
+            "description": "This file contains the results of a fine tune job."
+          },
+          {
+            "value": "assistants",
+            "description": "This file contains data to be used in assistants."
+          },
+          {
+            "value": "assistants_output",
+            "description": "This file contains the results of an assistant."
+          }
+        ]
+      }
+    },
+    "RougeScoreGraderConfig": {
+      "title": "RougeScoreGraderConfig",
+      "required": [
+        "hypothesis",
+        "reference",
+        "rouge_type",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "hypothesis": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "rouge_type": {
+          "$ref": "#/definitions/RougeType"
+        }
+      }
+    },
+    "RougeType": {
+      "title": "RougeType",
+      "enum": [
+        "rouge-1",
+        "rouge-2",
+        "rouge-3",
+        "rouge-4",
+        "rouge-5",
+        "rouge-l"
+      ],
+      "type": "string"
+    },
+    "RunApiObject": {
+      "title": "RunApiObject",
+      "description": "Defines the values of a evaluation job.",
+      "required": [
+        "pipeline_config",
+        "run_type",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "org_id": {
+          "description": "The organisation id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.",
+          "type": "string"
+        },
+        "run_type": {
+          "$ref": "#/definitions/RunType"
+        },
+        "status": {
+          "title": "EvalRunStatus",
+          "description": "The status of this run or item.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/EvalRunStatusValidating"
+            }
+          ]
+        },
+        "evaluated_model_name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "aggregation_outputs": {
+          "$ref": "#/definitions/AggregationResultList"
+        },
+        "aggregation_file_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "output_data_fileId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "pipeline_config": {
+          "$ref": "#/definitions/PipelineConfig"
+        },
+        "run_stats": {
+          "$ref": "#/definitions/OutputEvalRunStats"
+        },
+        "validation_stats": {
+          "$ref": "#/definitions/BaseEvalRunStats"
+        }
+      }
+    },
+    "RunStatus": {
+      "title": "RunStatus",
+      "description": "The state of a evaluation.",
+      "enum": [
+        "all",
+        "active",
+        "complete",
+        "failed",
+        "success"
+      ],
+      "type": "string"
+    },
+    "RunStatusPollApiObject": {
+      "title": "RunStatusPollApiObject",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "run_id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "status": {
+          "title": "EvalRunStatus",
+          "description": "The status of this run or item.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/EvalRunStatusValidating"
+            }
+          ],
+          "readOnly": true
+        },
+        "cancel_requested_at": {
+          "format": "int32",
+          "description": "A timestamp when this job or item was cancelled (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "RunType": {
+      "title": "RunType",
+      "description": "The state of a file.",
+      "enum": [
+        "dry-run",
+        "full-run",
+        "batch-run"
+      ],
+      "type": "string"
+    },
+    "Sample": {
+      "title": "Sample",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "trajectory": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessage"
+          },
+          "readOnly": true
+        },
+        "outputs": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessage"
+          },
+          "readOnly": true
+        }
+      },
+      "readOnly": true
+    },
+    "SampleGeneratorConfig": {
+      "title": "SampleGeneratorConfig",
+      "required": [
+        "model_name",
+        "sampling_params",
+        "trajectory_template"
+      ],
+      "type": "object",
+      "properties": {
+        "trajectory_template": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessage"
+          }
+        },
+        "model_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sampling_params": {
+          "$ref": "#/definitions/ModelSamplingParams"
+        }
+      }
+    },
+    "SetComparisonGraderConfig": {
+      "title": "SetComparisonGraderConfig",
+      "required": [
+        "case_sensitive",
+        "comparison_disjoint_grade",
+        "comparison_equal_grade",
+        "comparison_intersect_grade",
+        "comparison_subset_grade",
+        "comparison_superset_grade",
+        "hypothesis_set",
+        "reference_set",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference_set": {
+          "$ref": "#/definitions/StringDelimitedSetExpressionConfig"
+        },
+        "hypothesis_set": {
+          "$ref": "#/definitions/StringDelimitedSetExpressionConfig"
+        },
+        "case_sensitive": {
+          "type": "boolean"
+        },
+        "comparison_equal_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "comparison_subset_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "comparison_superset_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "comparison_intersect_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "comparison_disjoint_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "SetMembershipGraderConfig": {
+      "title": "SetMembershipGraderConfig",
+      "required": [
+        "absent_grade",
+        "case_sensitive",
+        "element",
+        "present_grade",
+        "set",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "element": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "set": {
+          "title": "HashSet`1",
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "title": "ExpressionConfig",
+            "allOf": [
+              {
+                "$ref": "#/definitions/VariableReferenceExpressionConfig"
+              }
+            ]
+          }
+        },
+        "case_sensitive": {
+          "type": "boolean"
+        },
+        "present_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "absent_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "StringCheckGraderConfig": {
+      "title": "StringCheckGraderConfig",
+      "required": [
+        "case_sensitive",
+        "false_grade",
+        "lhs",
+        "operation",
+        "rhs",
+        "true_grade",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lhs": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "rhs": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "case_sensitive": {
+          "type": "boolean"
+        },
+        "operation": {
+          "$ref": "#/definitions/StringCheckGraderConfigOperation"
+        },
+        "true_grade": {
+          "format": "float",
+          "type": "number"
+        },
+        "false_grade": {
+          "format": "float",
+          "type": "number"
+        }
+      }
+    },
+    "StringCheckGraderConfigOperation": {
+      "title": "StringCheckGraderConfigOperation",
+      "enum": [
+        "equals",
+        "contains",
+        "starts-with",
+        "ends-with"
+      ],
+      "type": "string"
+    },
+    "StringCountGraderConfig": {
+      "title": "StringCountGraderConfig",
+      "required": [
+        "case_sensitive",
+        "hypothesis",
+        "reference",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/NonModelGraderConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "hypothesis": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        },
+        "case_sensitive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "StringDelimitedSetExpressionConfig": {
+      "title": "StringDelimitedSetExpressionConfig",
+      "required": [
+        "delimiter",
+        "expression"
+      ],
+      "type": "object",
+      "properties": {
+        "delimiter": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "expression": {
+          "title": "ExpressionConfig",
+          "allOf": [
+            {
+              "$ref": "#/definitions/VariableReferenceExpressionConfig"
+            }
+          ]
+        }
+      }
+    },
+    "TemplateStringExpressionConfig": {
+      "title": "TemplateStringExpressionConfig",
+      "required": [
+        "template",
+        "type"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ExpressionConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "template": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "TypeDiscriminator": {
+      "title": "TypeDiscriminator",
+      "description": "Defines the type of an object.",
+      "enum": [
+        "list",
+        "fine_tuning.job",
+        "file",
+        "fine_tuning.job.event",
+        "fine_tuning.job.checkpoint",
+        "model",
+        "upload",
+        "upload.part"
+      ],
+      "type": "string",
+      "readOnly": true,
+      "x-ms-enum": {
+        "name": "TypeDiscriminator",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "list",
+            "description": "This object represents a list of other objects."
+          },
+          {
+            "value": "fine_tuning.job",
+            "description": "This object represents a fine tune job."
+          },
+          {
+            "value": "file",
+            "description": "This object represents a file."
+          },
+          {
+            "value": "fine_tuning.job.event",
+            "description": "This object represents an event of a fine tuning job."
+          },
+          {
+            "value": "fine_tuning.job.checkpoint",
+            "description": "This object represents a checkpoint of a fine tuning job."
+          },
+          {
+            "value": "model",
+            "description": "This object represents a model (can be a base model or fine tune job result)."
+          },
+          {
+            "value": "upload",
+            "description": "This object represents a file upload."
+          },
+          {
+            "value": "upload.part",
+            "description": "This object represents part of a file upload."
+          }
+        ]
+      }
+    },
+    "UploadFileCompleteBody": {
+      "title": "UploadFileCompleteBody",
+      "required": [
+        "part_ids"
+      ],
+      "type": "object",
+      "properties": {
+        "part_ids": {
+          "title": "IList`1",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "md5": {
+          "type": "string"
+        }
+      }
+    },
+    "UploadFileStartBody": {
+      "title": "UploadFileStartBody",
+      "required": [
+        "bytes",
+        "filename",
+        "mime_type",
+        "purpose"
+      ],
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "$ref": "#/definitions/Purpose"
+        },
+        "filename": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "bytes": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "mime_type": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    },
+    "UploadPartResource": {
+      "title": "UploadPartResource",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "upload_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "azure_block_id": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "UploadResource": {
+      "title": "UploadResource",
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/TypeDiscriminator"
+        },
+        "created_at": {
+          "format": "unixtime",
+          "description": "A timestamp when this job or item was created (in unix epochs).",
+          "type": "integer",
+          "readOnly": true
+        },
+        "id": {
+          "description": "The identity of this item.",
+          "type": "string",
+          "readOnly": true
+        },
+        "bytes": {
+          "format": "int64",
+          "type": "integer",
+          "readOnly": true
+        },
+        "filename": {
+          "type": "string",
+          "readOnly": true
+        },
+        "purpose": {
+          "$ref": "#/definitions/Purpose"
+        },
+        "status": {
+          "$ref": "#/definitions/UploadStatus"
+        },
+        "expires_at": {
+          "format": "unixtime",
+          "type": "integer",
+          "readOnly": true
+        },
+        "file": {
+          "$ref": "#/definitions/File"
+        }
+      }
+    },
+    "UploadStatus": {
+      "title": "UploadStatus",
+      "enum": [
+        "pending",
+        "expired",
+        "completed",
+        "cancelled"
+      ],
+      "type": "string",
+      "readOnly": true
+    },
+    "VariableReferenceExpressionConfig": {
+      "title": "VariableReferenceExpressionConfig",
+      "required": [
+        "namespace_name",
+        "type",
+        "variable_name"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ExpressionConfig"
+        }
+      ],
+      "properties": {
+        "type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "namespace_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "variable_name": {
+          "minLength": 1,
+          "type": "string"
+        }
+      }
+    }
+  },
+  "parameters": {
+    "endpoint": {
+      "in": "path",
+      "name": "endpoint",
+      "description": "Supported Cognitive Services endpoints (protocol and hostname, for example: https://aoairesource.openai.azure.com. Replace \"aoairesource\" with your Azure OpenAI account name).",
+      "required": true,
+      "type": "string",
+      "format": "url",
+      "x-ms-skip-url-encoding": true,
+      "x-ms-parameter-location": "client"
+    },
+    "apiVersionQueryParameter": {
+      "in": "query",
+      "name": "api-version",
+      "description": "The requested API version.",
+      "required": true,
+      "type": "string",
+      "x-ms-client-default": "2024-08-01-preview",
+      "x-ms-parameter-location": "client"
+    }
+  },
+  "securityDefinitions": {
+    "api-key": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header",
+      "description": "Provide your Cognitive Services Azure OpenAI account key here."
+    }
+  },
+  "security": [
+    {
+      "api-key": [ ]
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "x-ms-parameterized-host": {
+    "hostTemplate": "{endpoint}/openai",
+    "useSchemePrefix": false,
+    "parameters": [
+      {
+        "$ref": "#/parameters/endpoint"
+      }
+    ]
+  }
+}
