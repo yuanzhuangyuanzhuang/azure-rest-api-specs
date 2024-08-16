@@ -1,0 +1,3264 @@
+openapi: 3.0.1
+info:
+  title: Azure OpenAI API version 2024-08-01-preview
+  description: APIs for fine-tuning and managing deployments of OpenAI models.
+  version: 2024-08-01-preview
+paths:
+  /evals/dashboard/preview_file:
+    post:
+      tags:
+        - 'Evaluation:'
+      summary: "Preview Data Source File\r\nPreview a file to be used as a data source for an eval."
+      operationId: Evaluation_EvalDashboardPreview
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: The specification of the evaluation dashboard preview request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvalDashboardPreviewFileBody'
+        required: true
+        x-bodyName: evalDashboardPreviewRequest
+      responses:
+        '200':
+          description: The evaluation job has been successfully canceled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilePreviewApiObject'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Gets the input file data prior to the execution of a evaluation job.:
+          $ref: ./examples/post_evaluation_dashboard_preview.yaml
+  /evals/runs:
+    post:
+      tags:
+        - 'Evaluation:'
+      summary: "Creates a run that evaluates a specified model from a given test file.\r\nThis will return a run_id and the initial status of the run."
+      operationId: Evaluation_Create
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: The specification of the evaluation.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvalCreateRunRequestBody'
+        required: true
+        x-bodyName: evaluationRun
+      responses:
+        '201':
+          description: The evaluation job has been successfully created.
+          headers:
+            Location:
+              description: The location of the newly created item.
+              schema:
+                type: string
+                description: The location of the newly created item.
+                format: url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunApiObject'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Creating an evaluation job.:
+          $ref: ./examples/post_evaluation.yaml
+    get:
+      tags:
+        - 'Evaluation:'
+      summary: "Gets details for a list of evaluation runs specified by a number of filters including status and time after, with a page limit option.\r\nThe details contain the run status, pipeline_config, and id."
+      operationId: Evaluation_GetRuns
+      parameters:
+        - name: status
+          in: query
+          description: Optional filter on the status of the Evaluation runs to retrieve. Default to all statuses.
+          schema:
+            $ref: '#/components/schemas/RunStatus'
+        - name: limit
+          in: query
+          description: Number of Evaluation runs to retrieve. Defaults to 20.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: after
+          in: query
+          description: Optional filter on the creation time of Evaluation runs to retrieve.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRunList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting all evaluation job owned by this account.:
+          $ref: ./examples/get_list_evaluation.yaml
+  '/evals/runs/{run-id}/cancel':
+    post:
+      tags:
+        - 'Evaluation:'
+      summary: Cancels the processing of the evaluation run specified by the given evaluation-id.
+      operationId: Evaluation_Cancel
+      parameters:
+        - name: run-id
+          in: path
+          description: The identifier of the evaluation run.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: The evaluation job has been successfully canceled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunStatusPollApiObject'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Canceling an evaluation job.:
+          $ref: ./examples/post_cancel_evaluation.yaml
+  '/evals/runs/{run-id}/aggregation_outputs':
+    get:
+      tags:
+        - 'Evaluation:'
+      summary: Gets the aggregation outputs for an Evaluation run specified by the given evaluation-id.
+      operationId: Evaluation_GetAggregationOutputs
+      parameters:
+        - name: run-id
+          in: path
+          description: The identifier of the evaluation run.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunAggregationOutputsApiObject'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting aggregation outputs for this evaluation job.:
+          $ref: ./examples/get_aggregation_outputs_evaluation.yaml
+  '/evals/runs/{run-id}':
+    get:
+      tags:
+        - 'Evaluation:'
+      summary: "Gets details for a single evaluation run specified by the given evaluation-id.\r\nThe details contain the run status, pipeline_config, and id."
+      operationId: Evaluation_Get
+      parameters:
+        - name: run-id
+          in: path
+          description: The identifier of the evaluation run.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunApiObject'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting an evaluation job.:
+          $ref: ./examples/get_evaluation.yaml
+  '/evals/runs/{run-id}/status':
+    get:
+      tags:
+        - 'Evaluation:'
+      summary: Gets status for a single evaluation run specified by the given evaluation-id.
+      operationId: Evaluation_GetStatus
+      parameters:
+        - name: run-id
+          in: path
+          description: The identifier of the evaluation run.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunStatusPollApiObject'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting the status for an evaluation job.:
+          $ref: ./examples/get_status_evaluation.yaml
+  '/evals/runs/{run-id}/output_data_items':
+    get:
+      tags:
+        - 'Evaluation:'
+      summary: "Gets details for a single evaluation run specified by the given evaluation-id.\r\nThe details contain the run status, pipeline_config, and id."
+      operationId: Evaluation_GetOutputDataItems
+      parameters:
+        - name: run-id
+          in: path
+          description: The identifier of the evaluation run.
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of Evaluation runs to retrieve. Defaults to 20.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: after
+          in: query
+          description: Optional filter on the creation time of Evaluation runs to retrieve.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputDataItemList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting data item outputs for this evaluation job.:
+          $ref: ./examples/get_list_output_data_items_evaluation.yaml
+  '/subscriptions/{subscription_id}/resourcegroups/{resourcegroup}/accounts/{accountName}/internal/files/{file-id}':
+    get:
+      tags:
+        - 'Files:'
+      summary: Gets details for a single file specified by the given file-id.
+      operationId: Files_Get_Details
+      parameters:
+        - name: file-id
+          in: path
+          description: The identifier of the file.
+          required: true
+          schema:
+            type: string
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: resourcegroup
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: accountName
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileDetails'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting a file details.:
+          $ref: ./examples/get_file_details.yaml
+  '/subscriptions/{subscription_id}/resourcegroups/{resourcegroup}/accounts/{accountName}/internal/files':
+    post:
+      tags:
+        - 'Files:'
+      summary: Creates a new file entity by creating cosmos db entry only.
+      operationId: Files_Create
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: resourcegroup
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: accountName
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: 'The definition of the file to create including its purpose, the file name and the url of the file location.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileCreate'
+        required: true
+        x-bodyName: fileCreate
+      responses:
+        '201':
+          description: The file has been successfully created.
+          headers:
+            Location:
+              description: The location of the newly created item.
+              schema:
+                type: string
+                description: The location of the newly created item.
+                format: url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileDetails'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Create a file with a blob url as source.:
+          $ref: ./examples/create_file.yaml
+  /files:
+    get:
+      tags:
+        - 'Files:'
+      summary: "Gets a list of all files owned by the Azure OpenAI resource.\r\nThese include user uploaded content like files with purpose \"fine-tune\" for training or validation of fine-tunes models\r\nas well as files that are generated by the service such as \"fine-tune-results\" which contains various metrics for the corresponding fine-tune job."
+      operationId: Files_List
+      parameters:
+        - name: purpose
+          in: query
+          description: Only return files with the given purpose.
+          schema:
+            $ref: '#/components/schemas/Purpose'
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting all files owned by this account.:
+          $ref: ./examples/get_files.yaml
+    post:
+      tags:
+        - 'Files:'
+      summary: 'Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.'
+      operationId: Files_Upload
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - file
+                - purpose
+              type: object
+              properties:
+                purpose:
+                  $ref: '#/components/schemas/Purpose'
+                file:
+                  type: file
+                  description: Gets or sets the file to upload into Azure OpenAI.
+            encoding:
+              purpose:
+                style: form
+              file:
+                style: form
+      responses:
+        '201':
+          description: The file has been successfully created.
+          headers:
+            Location:
+              description: The location of the newly created item.
+              schema:
+                type: string
+                description: The location of the newly created item.
+                format: url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Upload a file.:
+          $ref: ./examples/upload_file.yaml
+  '/files/{file-id}':
+    get:
+      tags:
+        - 'Files:'
+      summary: 'Gets details for a single file specified by the given file-id including status, size, purpose, etc.'
+      operationId: Files_Get
+      parameters:
+        - name: file-id
+          in: path
+          description: The identifier of the file.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting a file.:
+          $ref: ./examples/get_file.yaml
+    delete:
+      tags:
+        - 'Files:'
+      summary: "Deletes the file with the given file-id.\r\nDeletion is also allowed if a file was used, e.g., as training file in a fine-tune job."
+      operationId: Files_Delete
+      parameters:
+        - name: file-id
+          in: path
+          description: The identifier of the file.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '204':
+          description: The file was successfully deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Deleting a file.:
+          $ref: ./examples/delete_file.yaml
+  '/files/{file-id}/content':
+    get:
+      tags:
+        - 'Files:'
+      summary: "Gets the content of the file specified by the given file-id.\r\nFiles can be user uploaded content or generated by the service like result metrics of a fine-tune job."
+      operationId: Files_GetContent
+      parameters:
+        - name: file-id
+          in: path
+          description: The identifier of the file.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: file
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting the file content.:
+          $ref: ./examples/get_file_content.yaml
+  /files/import:
+    post:
+      tags:
+        - 'Files:'
+      summary: 'Creates a new file entity by importing data from a provided url. Uploaded files can, for example, be used for training or evaluating fine-tuned models.'
+      operationId: Files_Import
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: 'The definition of the file to create including its purpose, the file name and the url of the file location.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileImport'
+        required: true
+        x-bodyName: fileImport
+      responses:
+        '201':
+          description: The file has been successfully created.
+          headers:
+            Location:
+              description: The location of the newly created item.
+              schema:
+                type: string
+                description: The location of the newly created item.
+                format: url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Importing a file with a blob url as source.:
+          $ref: ./examples/import_file.yaml
+  /fine_tuning/jobs:
+    get:
+      tags:
+        - 'Fine-tuning:'
+      summary: "Gets a list of all fine-tune jobs owned by the Azure OpenAI resource.\r\nThe details that are returned for each fine-tune job contain besides its identifier\r\nthe base model, training and validation files, hyper parameters, time stamps, status and events.\r\nEvents are created when the job status changes, e.g. running or complete, and when results are uploaded."
+      operationId: FineTuning_List
+      parameters:
+        - name: after
+          in: query
+          description: Identifier for the last event from the previous pagination request.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of events to retrieve. Defaults to 20.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJobList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting all fine tuning jobs owned by this account.:
+          $ref: ./examples/get_finetuning_jobs.yaml
+    post:
+      tags:
+        - 'Fine-tuning:'
+      summary: "Creates a job that fine-tunes a specified model from a given training file.\r\nResponse includes details of the enqueued job including job status and hyper parameters.\r\nThe name of the fine-tuned model is added to the response once complete."
+      operationId: FineTuning_Create
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: "The specification of the fine-tuned model to create.\r\nRequired parameters are the base model and the training file to use.\r\nOptionally a validation file can be specified to compute validation metrics during training.\r\nHyper parameters will be set to default values or can be optionally specified.\r\nThese include batch size, learning rate multiplier, number of epochs and others."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FineTuningJobCreation'
+        required: true
+        x-bodyName: fineTuningJob
+      responses:
+        '201':
+          description: The fine tune has been successfully created.
+          headers:
+            Location:
+              description: The location of the newly created item.
+              schema:
+                type: string
+                description: The location of the newly created item.
+                format: url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJob'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Creating a fine tuning job.:
+          $ref: ./examples/post_finetuning_job.yaml
+  '/fine_tuning/jobs/{fine-tuning-job-id}':
+    get:
+      tags:
+        - 'Fine-tuning:'
+      summary: "Gets details for a single fine-tune job specified by the given fine-tune-id.\r\nThe details contain the base model, training and validation files, hyper parameters, time stamps, status and events.\r\nEvents are created when the job status changes, e.g. running or complete, and when results are uploaded."
+      operationId: FineTuning_Get
+      parameters:
+        - name: fine-tuning-job-id
+          in: path
+          description: The identifier of the fine-tune job.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJob'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting a fine tuning job.:
+          $ref: ./examples/get_finetuning_job.yaml
+    delete:
+      tags:
+        - 'Fine-tuning:'
+      summary: Deletes the fine-tune job specified by the given fine-tune-id.
+      operationId: FineTuning_Delete
+      parameters:
+        - name: fine-tuning-job-id
+          in: path
+          description: The identifier of the fine-tune job.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '204':
+          description: The fine tune was successfully deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Deleting a fine tuning job.:
+          $ref: ./examples/delete_finetuning_job.yaml
+  '/fine_tuning/jobs/{fine-tuning-job-id}/events':
+    get:
+      tags:
+        - 'Fine-tuning:'
+      summary: "Gets the events for the fine-tune job specified by the given fine-tune-id.\r\nEvents are created when the job status changes, e.g. running or complete, and when results are uploaded."
+      operationId: FineTuning_GetEvents
+      parameters:
+        - name: fine-tuning-job-id
+          in: path
+          description: The identifier of the fine-tune job.
+          required: true
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: Identifier for the last event from the previous pagination request.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of events to retrieve. Defaults to 20.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJobEventList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting events of a fine tuning job.:
+          $ref: ./examples/get_finetuning_job_events.yaml
+  '/fine_tuning/jobs/{fine-tuning-job-id}/checkpoints':
+    get:
+      tags:
+        - 'Fine-tuning:'
+      summary: "Gets the checkpoints for the fine-tune job specified by the given fine-tune-id.\r\nCheckpoints are created at the end of successful epochs during training."
+      operationId: FineTuning_GetCheckpoints
+      parameters:
+        - name: fine-tuning-job-id
+          in: path
+          description: The identifier of the fine-tune job.
+          required: true
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: Identifier for the last checkpoint ID from the previous pagination request.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of checkpoints to retrieve. Defaults to 10.
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJobCheckpointList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting checkpoints of a fine tuning job.:
+          $ref: ./examples/get_finetuning_job_checkpoints.yaml
+  '/fine_tuning/jobs/{fine-tuning-job-id}/cancel':
+    post:
+      tags:
+        - 'Fine-tuning:'
+      summary: Cancels the processing of the fine-tune job specified by the given fine-tune-id.
+      operationId: FineTuning_Cancel
+      parameters:
+        - name: fine-tuning-job-id
+          in: path
+          description: The identifier of the fine-tune job.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: The fine tune has been successfully canceled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJob'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Canceling a fine tuning job.:
+          $ref: ./examples/cancel_finetuning_job.yaml
+  /models:
+    get:
+      tags:
+        - 'Models:'
+      summary: "Gets a list of all models that are accessible by the Azure OpenAI resource.\r\nThese include base models as well as all successfully completed fine-tuned models owned by the Azure OpenAI resource."
+      operationId: Models_List
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelList'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting all models owned by account.:
+          $ref: ./examples/get_models.yaml
+  '/models/{model-id}':
+    get:
+      tags:
+        - 'Models:'
+      summary: Gets details for the model specified by the given modelId.
+      operationId: Models_Get
+      parameters:
+        - name: model-id
+          in: path
+          description: The identifier of the model.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Getting a base model.:
+          $ref: ./examples/get_model_base.yaml
+        Getting a fine-tuned model.:
+          $ref: ./examples/get_model_finetune.yaml
+  /uploads:
+    post:
+      tags:
+        - 'UploadFile:'
+      summary: 'Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.'
+      operationId: Upload_File_Start
+      parameters:
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: The definition of the file to create including its purpose and the location on the local machine.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadFileStartBody'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UploadFileStartBody'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UploadFileStartBody'
+        required: true
+        x-bodyName: requestBody
+      responses:
+        '201':
+          description: The upload has been successfully created.
+          headers:
+            Location:
+              description: The location of the newly created item.
+              schema:
+                type: string
+                description: The location of the newly created item.
+                format: url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResource'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Start a large file upload operation.:
+          $ref: ./examples/upload_file_start.yaml
+  '/uploads/{upload-id}/parts':
+    post:
+      tags:
+        - 'UploadFile:'
+      summary: 'Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.'
+      operationId: Upload_File_Part
+      parameters:
+        - name: upload-id
+          in: path
+          description: The identifier of the upload.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - data
+              type: object
+              properties:
+                data:
+                  type: file
+            encoding:
+              data:
+                style: form
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadPartResource'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Upload a part of large file upload operation.:
+          $ref: ./examples/upload_file_part.yaml
+  '/uploads/{upload-id}/complete':
+    post:
+      tags:
+        - 'UploadFile:'
+      summary: 'Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.'
+      operationId: Upload_File_Complete
+      parameters:
+        - name: upload-id
+          in: path
+          description: The identifier of the upload.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      requestBody:
+        description: The definition of the file to create including its purpose and the location on the local machine.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadFileCompleteBody'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UploadFileCompleteBody'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UploadFileCompleteBody'
+        required: true
+        x-bodyName: requestBody
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResource'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Complete and validate a large file upload operation.:
+          $ref: ./examples/upload_file_complete.yaml
+  '/uploads/{upload-id}/cancel':
+    post:
+      tags:
+        - 'UploadFile:'
+      summary: 'Creates a new file entity by uploading data from a local machine. Uploaded files can, for example, be used for training or evaluating fine-tuned models.'
+      operationId: Upload_File_Cancel
+      parameters:
+        - name: upload-id
+          in: path
+          description: The identifier of the upload.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/apiVersionQueryParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResource'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-examples:
+        Cancel a large file upload operation.:
+          $ref: ./examples/upload_file_cancel.yaml
+components:
+  schemas:
+    AggregationResult:
+      title: AggregationResult
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        identifier:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        data:
+          nullable: true
+          readOnly: true
+    AggregationResultList:
+      title: AggregationResultList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AggregationResult'
+          description: The list of items.
+          nullable: true
+        has_more:
+          type: boolean
+          description: A value indicating whether the list contains more elements than returned.
+      readOnly: true
+    AggregatorConfig:
+      title: AggregatorConfig
+      required:
+        - name
+        - target
+        - type
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+        description:
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/AggregatorType'
+        target:
+          $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+    AggregatorType:
+      title: AggregatorType
+      enum:
+        - mean
+        - sum
+      type: string
+      description: Defines the types of Aggregators.
+    BaseEvalRunStats:
+      title: BaseEvalRunStats
+      type: object
+      properties:
+        num_data_source_items:
+          type: integer
+          format: int32
+        num_samples:
+          type: integer
+          format: int32
+      description: Defines the values of a evaluation job.
+    BaseRunApiObject:
+      title: BaseRunApiObject
+      required:
+        - run_type
+        - status
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        org_id:
+          type: string
+          description: The organisation id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.
+          nullable: true
+        user_id:
+          type: string
+          description: The user id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.
+          nullable: true
+        run_type:
+          $ref: '#/components/schemas/RunType'
+        status:
+          title: EvalRunStatus
+          oneOf:
+            - $ref: '#/components/schemas/EvalRunStatusValidating'
+            - $ref: '#/components/schemas/EvalRunStatusWaiting'
+            - $ref: '#/components/schemas/EvalRunStatusRunning'
+            - $ref: '#/components/schemas/EvalRunStatusFailed'
+            - $ref: '#/components/schemas/EvalRunStatusSucceeded'
+          description: The status of this run or item.
+          readOnly: true
+        evaluated_model_name:
+          type: string
+          nullable: true
+          readOnly: true
+        display_name:
+          type: string
+          nullable: true
+        updated_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        aggregation_outputs:
+          $ref: '#/components/schemas/AggregationResultList'
+        aggregation_file_id:
+          type: string
+          nullable: true
+          readOnly: true
+        output_data_fileId:
+          type: string
+          nullable: true
+          readOnly: true
+    BleuScoreGraderConfig:
+      title: BleuScoreGraderConfig
+      required:
+        - hypothesis
+        - reference
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        hypothesis:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+    Capabilities:
+      title: Capabilities
+      required:
+        - chat_completion
+        - completion
+        - embeddings
+        - fine_tune
+        - inference
+      type: object
+      properties:
+        fine_tune:
+          type: boolean
+          description: A value indicating whether a model can be used for fine tuning.
+        inference:
+          type: boolean
+          description: A value indicating whether a model can be deployed.
+        completion:
+          type: boolean
+          description: A value indicating whether a model supports completion.
+        chat_completion:
+          type: boolean
+          description: A value indicating whether a model supports chat completion.
+        embeddings:
+          type: boolean
+          description: A value indicating whether a model supports embeddings.
+      description: The capabilities of a base or fine tune model.
+    ChatCriteriaModelGraderConfig:
+      title: ChatCriteriaModelGraderConfig
+      required:
+        - conversation
+        - criteria
+        - false_grade
+        - model_name
+        - response
+        - true_grade
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        model_name:
+          minLength: 1
+          type: string
+        conversation:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        response:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        criteria:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        true_grade:
+          type: number
+          format: float
+        false_grade:
+          type: number
+          format: float
+    ChatMessage:
+      title: ChatMessage
+      required:
+        - content
+        - role
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/ChatMessageRole'
+        content:
+          minLength: 1
+          type: string
+    ChatMessageRole:
+      title: ChatMessageRole
+      enum:
+        - system
+        - user
+        - assistant
+      type: string
+    ClosedQAModelGraderConfig:
+      title: ClosedQAModelGraderConfig
+      required:
+        - criterion
+        - false_grade
+        - model_name
+        - submission
+        - task
+        - true_grade
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        model_name:
+          minLength: 1
+          type: string
+        task:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        submission:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        criterion:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        true_grade:
+          type: number
+          format: float
+        false_grade:
+          type: number
+          format: float
+    ConstantExpressionConfig:
+      title: ConstantExpressionConfig
+      required:
+        - type
+        - value
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ExpressionConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        value: { }
+    ConstantGraderConfig:
+      title: ConstantGraderConfig
+      required:
+        - output_grade
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        output_grade:
+          type: number
+          format: float
+    DataSourceConfig:
+      title: DataSourceConfig
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          minLength: 1
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          file-service: '#/components/schemas/FileServiceDataSourceConfig'
+    DataSourceConfigFileType:
+      title: DataSourceConfigFileType
+      enum:
+        - jsonl
+      type: string
+      description: The type of a file.
+    DataSourceItemSchema:
+      title: DataSourceItemSchema
+      type: object
+      properties:
+        fields:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSourceSchemaField'
+          nullable: true
+    DataSourceSchemaField:
+      title: DataSourceSchemaField
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/DataSourceSchemaFieldType'
+    DataSourceSchemaFieldType:
+      title: DataSourceSchemaFieldType
+      enum:
+        - string
+        - number
+        - boolean
+        - object
+        - array
+      type: string
+    Deprecation:
+      title: Deprecation
+      required:
+        - inference
+      type: object
+      properties:
+        fine_tune:
+          type: integer
+          description: The end date of fine tune support of this model. Will be `null` for fine tune models.
+          format: unixtime
+        inference:
+          type: integer
+          description: The end date of inference support of this model.
+          format: unixtime
+      description: "Defines the dates of deprecation for the different use cases of a model.\r\nUsually base models support 1 year of fine tuning after creation. Inference is typically supported 2 years after creation of base or\r\nfine tuned models. The exact dates are specified in the properties."
+    DiscreteClassificationModelGraderConfig:
+      title: DiscreteClassificationModelGraderConfig
+      required:
+        - invalid_grade
+        - labels
+        - model_name
+        - prompt
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        model_name:
+          minLength: 1
+          type: string
+        prompt:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        invalid_grade:
+          type: number
+          format: float
+        labels:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscreteClassificationModelGraderLabelConfig'
+    DiscreteClassificationModelGraderLabelConfig:
+      title: DiscreteClassificationModelGraderLabelConfig
+      type: object
+      properties:
+        text:
+          type: string
+          nullable: true
+        grade:
+          type: number
+          format: float
+    Error:
+      title: Error
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        message:
+          minLength: 1
+          type: string
+          description: The message of this error.
+        target:
+          type: string
+          description: The location where the error happened if available.
+          nullable: true
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+          description: The error details if available.
+          nullable: true
+        innererror:
+          $ref: '#/components/schemas/InnerError'
+      description: "Error content as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses)."
+    ErrorCode:
+      title: ErrorCode
+      enum:
+        - conflict
+        - invalidPayload
+        - forbidden
+        - notFound
+        - unexpectedEntityState
+        - itemDoesAlreadyExist
+        - serviceUnavailable
+        - internalFailure
+        - quotaExceeded
+        - jsonlValidationFailed
+        - fileImportFailed
+      type: string
+      description: "Error codes as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses)."
+      x-ms-enum:
+        name: ErrorCode
+        modelAsString: true
+        values:
+          - value: conflict
+            description: The requested operation conflicts with the current resource state.
+          - value: invalidPayload
+            description: The request data is invalid for this operation.
+          - value: forbidden
+            description: The operation is forbidden for the current user/api key.
+          - value: notFound
+            description: The resource is not found.
+          - value: unexpectedEntityState
+            description: The operation cannot be executed in the current resource's state.
+          - value: itemDoesAlreadyExist
+            description: The item does already exist.
+          - value: serviceUnavailable
+            description: The service is currently not available.
+          - value: internalFailure
+            description: Internal error. Please retry.
+          - value: quotaExceeded
+            description: Quota exceeded.
+          - value: jsonlValidationFailed
+            description: Validation of jsonl data failed.
+          - value: fileImportFailed
+            description: Import of file failed.
+    ErrorResponse:
+      title: ErrorResponse
+      required:
+        - error
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/Error'
+      description: "Error response as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses)."
+    EvalCreateRunRequestBody:
+      title: EvalCreateRunRequestBody
+      required:
+        - pipeline_config
+        - run_type
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Display name for the run.
+          nullable: true
+        run_type:
+          $ref: '#/components/schemas/RunType'
+        pipeline_config:
+          $ref: '#/components/schemas/PipelineConfig'
+      description: Defines the values of an evaluation job.
+    EvalDashboardPreviewFileBody:
+      title: EvalDashboardPreviewFileBody
+      required:
+        - file_id
+      type: object
+      properties:
+        file_id:
+          minLength: 1
+          type: string
+          description: Display name for the run.
+      description: Defines the values of an evaluation job.
+    EvalRunAggregationOutputsApiObject:
+      title: EvalRunAggregationOutputsApiObject
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        run_id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        aggregation_outputs:
+          $ref: '#/components/schemas/AggregationResultList'
+    EvalRunStatus:
+      title: EvalRunStatus
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          minLength: 1
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          validating: '#/components/schemas/EvalRunStatusValidating'
+          waiting: '#/components/schemas/EvalRunStatusWaiting'
+          running: '#/components/schemas/EvalRunStatusRunning'
+          failed: '#/components/schemas/EvalRunStatusFailed'
+          succeeded: '#/components/schemas/EvalRunStatusSucceeded'
+    EvalRunStatusFailed:
+      title: EvalRunStatusFailed
+      required:
+        - failure_user_message
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EvalRunStatus'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reason:
+          $ref: '#/components/schemas/FailureReason'
+        failure_user_message:
+          minLength: 1
+          type: string
+    EvalRunStatusRunning:
+      title: EvalRunStatusRunning
+      required:
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EvalRunStatus'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        approximate_percentage_complete:
+          type: number
+          format: float
+          nullable: true
+    EvalRunStatusSucceeded:
+      title: EvalRunStatusSucceeded
+      required:
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EvalRunStatus'
+      properties:
+        type:
+          minLength: 1
+          type: string
+    EvalRunStatusValidating:
+      title: EvalRunStatusValidating
+      required:
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EvalRunStatus'
+      properties:
+        type:
+          minLength: 1
+          type: string
+    EvalRunStatusWaiting:
+      title: EvalRunStatusWaiting
+      required:
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EvalRunStatus'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        approximate_start_time:
+          type: integer
+          format: int32
+          nullable: true
+    EvaluationRunList:
+      title: EvaluationRunList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseRunApiObject'
+          description: The list of items.
+          nullable: true
+        has_more:
+          type: boolean
+          description: A value indicating whether the list contains more elements than returned.
+      description: Represents a list of fine tunes.
+    EventType:
+      title: EventType
+      enum:
+        - message
+        - metrics
+      type: string
+      description: Defines the severity of a content filter result.
+      x-ms-enum:
+        name: EventType
+        modelAsString: true
+        values:
+          - value: message
+            description: Event only contains human readable messages.
+          - value: metrics
+            description: Event contains metrics.
+    ExpressionConfig:
+      title: ExpressionConfig
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          minLength: 1
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          vref: '#/components/schemas/VariableReferenceExpressionConfig'
+          tstr: '#/components/schemas/TemplateStringExpressionConfig'
+          const: '#/components/schemas/ConstantExpressionConfig'
+    FactualityModelGraderConfig:
+      title: FactualityModelGraderConfig
+      required:
+        - agreement_grade
+        - differ_but_factual_agreement_grade
+        - disagreement_grade
+        - model_name
+        - question
+        - reference
+        - submission
+        - subset_grade
+        - superset_grade
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        model_name:
+          minLength: 1
+          type: string
+        question:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        reference:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        submission:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        subset_grade:
+          type: number
+          format: float
+        superset_grade:
+          type: number
+          format: float
+        agreement_grade:
+          type: number
+          format: float
+        disagreement_grade:
+          type: number
+          format: float
+        differ_but_factual_agreement_grade:
+          type: number
+          format: float
+    FailureReason:
+      title: FailureReason
+      enum:
+        - user_cancelled
+        - internal_error
+      type: string
+    File:
+      title: File
+      required:
+        - filename
+        - purpose
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        bytes:
+          type: integer
+          description: "The size of this file when available (can be null). File sizes larger than 2^53-1 are not supported to ensure compatibility\r\nwith JavaScript integers."
+          format: int64
+          nullable: true
+          readOnly: true
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        filename:
+          minLength: 1
+          type: string
+          description: The name of the file.
+      description: A file is a document usable for training and validation. It can also be a service generated document with result details.
+      readOnly: true
+    FileCreate:
+      title: FileCreate
+      required:
+        - content_url
+        - purpose
+      type: object
+      properties:
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        content_url:
+          type: string
+          description: The url to download the document from (can be SAS url of a blob or any other external url accessible with a GET request).
+          format: url
+      description: Defines a document to import from an external content url to be usable with Azure OpenAI.
+    FileDetails:
+      title: FileDetails
+      required:
+        - filename
+        - purpose
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        filename:
+          minLength: 1
+          type: string
+          description: The name of the file.
+        path:
+          type: string
+          description: The  the relative path to the file within the container.
+          nullable: true
+          readOnly: true
+        storage_account_uri:
+          type: string
+          description: The storage account url of this file.
+          format: url
+          nullable: true
+          readOnly: true
+        storage_container_name:
+          type: string
+          description: The Storage Container Name of this file blob.
+          nullable: true
+          readOnly: true
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+      description: A file detail is a document used by batch service to fetch file blob details.
+    FileImport:
+      title: FileImport
+      required:
+        - content_url
+        - filename
+        - purpose
+      type: object
+      properties:
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        filename:
+          minLength: 1
+          type: string
+          description: "The name of the [JSON Lines](https://jsonlines.readthedocs.io/en/latest/) file to be uploaded.\r\nIf the `purpose` is set to \"fine-tune\", each line is a JSON record with \"prompt\" and \"completion\" fields representing your training examples."
+        content_url:
+          type: string
+          description: The url to download the document from (can be SAS url of a blob or any other external url accessible with a GET request).
+          format: url
+      description: Defines a document to import from an external content url to be usable with Azure OpenAI.
+    FileList:
+      title: FileList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+          description: The list of items.
+          nullable: true
+      description: Represents a list of files.
+    FilePreviewApiObject:
+      title: FilePreviewApiObject
+      required:
+        - file_id
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        file_id:
+          minLength: 1
+          type: string
+        preview:
+          title: IList`1
+          type: array
+          items:
+            title: IDictionary`2
+            type: object
+            additionalProperties: { }
+          nullable: true
+        item_schema:
+          $ref: '#/components/schemas/DataSourceItemSchema'
+        error:
+          type: string
+          nullable: true
+    FileServiceDataSourceConfig:
+      title: FileServiceDataSourceConfig
+      required:
+        - file_id
+        - file_type
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DataSourceConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        file_type:
+          $ref: '#/components/schemas/DataSourceConfigFileType'
+        file_id:
+          minLength: 1
+          type: string
+          description: The file id.
+        max_items:
+          type: integer
+          description: The type of file.
+          format: int32
+          nullable: true
+    FineTuningHyperParameters:
+      title: FineTuningHyperParameters
+      type: object
+      properties:
+        n_epochs:
+          type: integer
+          description: The number of epochs to train the model for. An epoch refers to one full cycle through the training dataset.
+          format: int32
+          nullable: true
+        batch_size:
+          type: integer
+          description: "The batch size to use for training. The batch size is the number of training examples used to train a single forward and backward pass.\r\nIn general, we've found that larger batch sizes tend to work better for larger datasets.\r\nThe default value as well as the maximum value for this property are specific to a base model."
+          format: int32
+          nullable: true
+        learning_rate_multiplier:
+          type: number
+          description: "The learning rate multiplier to use for training. The fine-tuning learning rate is the original learning rate used for pre-training multiplied by this value.\r\nLarger learning rates tend to perform better with larger batch sizes.\r\nWe recommend experimenting with values in the range 0.02 to 0.2 to see what produces the best results."
+          format: double
+          nullable: true
+      description: The hyper parameter settings used in a fine tune job.
+    FineTuningJob:
+      title: FineTuningJob
+      required:
+        - model
+        - training_file
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/FineTuningState'
+        model:
+          minLength: 1
+          type: string
+          description: The identifier (model-id) of the base model used for the fine-tune.
+        fine_tuned_model:
+          type: string
+          description: "The identifier (model-id) of the resulting fine tuned model. This property is only populated for successfully completed fine-tune runs.\r\nUse this identifier to create a deployment for inferencing."
+          nullable: true
+        training_file:
+          minLength: 1
+          type: string
+          description: The file which is used for training.
+        validation_file:
+          type: string
+          description: The file which is used to evaluate the fine tuned model during training.
+          nullable: true
+        result_files:
+          type: array
+          items:
+            type: string
+          description: "The result file identities (file-id) containing training and evaluation metrics in csv format.\r\nThe file is only available for successfully completed fine-tune runs."
+          nullable: true
+        finished_at:
+          type: integer
+          description: A timestamp when this job or item has finished successfully (in unix epochs).
+          format: int32
+          nullable: true
+        organisation_id:
+          type: string
+          description: The organisation id of this fine tune job. Unused on Azure OpenAI; compatibility for OpenAI only.
+          nullable: true
+        trained_tokens:
+          type: integer
+          description: The total number of billable tokens processed by this fine tuning job.
+          format: int32
+          readOnly: true
+        error:
+          $ref: '#/components/schemas/FineTuningJobError'
+        estimated_finish:
+          type: integer
+          description: The Unix timestamp (in seconds) for when the fine-tuning job is estimated to finish. The value will be null if the fine-tuning job is not running.
+          format: int32
+          nullable: true
+        hyperparameters:
+          $ref: '#/components/schemas/FineTuningHyperParameters'
+        suffix:
+          type: string
+          description: 'The suffix used to identify the fine-tuned model. The suffix can contain up to 40 characters (a-z, A-Z, 0-9,- and _) that will be added to your fine-tuned model name.'
+          nullable: true
+        seed:
+          type: integer
+          description: The seed used for the finetuning job.
+          format: int32
+          nullable: true
+      description: Defines the values of a fine tune job.
+    FineTuningJobCheckpoint:
+      title: FineTuningJobCheckpoint
+      required:
+        - created_at
+        - fine_tuned_model_checkpoint
+        - fine_tuning_job_id
+        - metrics
+        - step_number
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        id:
+          type: string
+          description: The identity of this checkpoint.
+          nullable: true
+          readOnly: true
+        created_at:
+          type: integer
+          description: The Unix timestamp (in seconds) for when the checkpoint was created.
+          format: unixtime
+        fine_tuned_model_checkpoint:
+          minLength: 1
+          type: string
+          description: The name of the fine-tuned checkpoint model that is created.
+        step_number:
+          type: integer
+          description: The step number that the checkpoint was created at.
+          format: int32
+        metrics:
+          title: Dictionary`2
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+            nullable: true
+          description: The metrics at the step number during the fine-tuning job.
+        fine_tuning_job_id:
+          minLength: 1
+          type: string
+          description: The name of the fine-tuning job that this checkpoint was created from..
+    FineTuningJobCheckpointList:
+      title: FineTuningJobCheckpointList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FineTuningJobCheckpoint'
+          description: The list of items.
+          nullable: true
+        has_more:
+          type: boolean
+          description: A value indicating whether the list contains more elements than returned.
+      description: Represents a list of checkpoints.
+    FineTuningJobCreation:
+      title: FineTuningJobCreation
+      required:
+        - model
+        - training_file
+      type: object
+      properties:
+        model:
+          minLength: 1
+          type: string
+          description: The identifier (model-id) of the base model used for this fine-tune.
+        training_file:
+          minLength: 1
+          type: string
+          description: The file identity (file-id) that is used for training this fine tuned model.
+        validation_file:
+          type: string
+          description: The file identity (file-id) that is used to evaluate the fine tuned model during training.
+          nullable: true
+        hyperparameters:
+          $ref: '#/components/schemas/FineTuningHyperParameters'
+        suffix:
+          type: string
+          description: 'The suffix used to identify the fine-tuned model. The suffix can contain up to 40 characters (a-z, A-Z, 0-9,- and _) that will be added to your fine-tuned model name.'
+          nullable: true
+        seed:
+          type: integer
+          description: 'The seed used for the finetuning job. Passing in the same seed and job parameters should produce the same results, but may differ in rare cases. If a seed is not specified, one will be generated for you.'
+          format: int32
+          nullable: true
+      description: Defines the values of a fine tune job.
+    FineTuningJobError:
+      title: FineTuningJobError
+      type: object
+      properties:
+        code:
+          type: string
+          description: The machine-readable error code..
+          nullable: true
+        message:
+          type: string
+          description: The human-readable error message.
+          nullable: true
+        param:
+          type: string
+          description: 'The parameter that was invalid, usually training_file or validation_file. This field will be null if the failure was not parameter-specific.'
+          nullable: true
+      description: 'For fine-tuning jobs that have failed, this will contain more information on the cause of the failure.'
+    FineTuningJobEvent:
+      title: FineTuningJobEvent
+      required:
+        - created_at
+        - level
+        - message
+        - type
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        id:
+          type: string
+          description: The identity of this event.
+          nullable: true
+          readOnly: true
+        created_at:
+          type: integer
+          description: A timestamp when this event was created (in unix epochs).
+          format: unixtime
+        level:
+          $ref: '#/components/schemas/LogLevel'
+        message:
+          minLength: 1
+          type: string
+          description: 'The message describing the event. This can be a change of state, e.g., enqueued, started, failed or completed, or other events like uploaded results.'
+        type:
+          $ref: '#/components/schemas/EventType'
+        data:
+          description: Machine readable data of this event.
+          nullable: true
+    FineTuningJobEventList:
+      title: FineTuningJobEventList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FineTuningJobEvent'
+          description: The list of items.
+          nullable: true
+        has_more:
+          type: boolean
+          description: A value indicating whether the list contains more elements than returned.
+      description: Represents a list of events.
+    FineTuningJobList:
+      title: FineTuningJobList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FineTuningJob'
+          description: The list of items.
+          nullable: true
+        has_more:
+          type: boolean
+          description: A value indicating whether the list contains more elements than returned.
+      description: Represents a list of fine tunes.
+    FineTuningState:
+      title: FineTuningState
+      enum:
+        - created
+        - pending
+        - running
+        - succeeded
+        - cancelled
+        - failed
+      type: string
+      description: The state of a finetunes object or fine tuning job.
+      readOnly: true
+      x-ms-enum:
+        name: FineTuningState
+        modelAsString: true
+        values:
+          - value: created
+            description: The operation was created. This state is not returned by Azure OpenAI and exposed only for compatibility. It can be categorized as an inactive state.
+          - value: pending
+            description: The operation is not yet queued to be processed in the future. It can be categorized as an inactive state.
+          - value: running
+            description: The operation has started to be processed. It can be categorized as an active state.
+          - value: succeeded
+            description: The operation has successfully be processed and is ready for consumption. It can be categorized as a terminal state.
+          - value: cancelled
+            description: The operation has been cancelled and is incomplete. It can be categorized as a terminal state.
+          - value: failed
+            description: The operation has completed processing with a failure and cannot be further consumed. It can be categorized as a terminal state.
+    GleuScoreGraderConfig:
+      title: GleuScoreGraderConfig
+      required:
+        - hypothesis
+        - reference
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        hypothesis:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+    GraderConfig:
+      title: GraderConfig
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        type:
+          minLength: 1
+          type: string
+        name:
+          minLength: 1
+          type: string
+        description:
+          type: string
+          nullable: true
+      discriminator:
+        propertyName: type
+        mapping:
+          set-membership-grader: '#/components/schemas/SetMembershipGraderConfig'
+          string-check-grader: '#/components/schemas/StringCheckGraderConfig'
+          constant-grader: '#/components/schemas/ConstantGraderConfig'
+          model-grader: '#/components/schemas/ModelGraderConfig'
+          rouge-score-grader: '#/components/schemas/RougeScoreGraderConfig'
+          bleu-score-grader: '#/components/schemas/BleuScoreGraderConfig'
+          closed-qa-model-grader: '#/components/schemas/ClosedQAModelGraderConfig'
+          factuality-model-grader: '#/components/schemas/FactualityModelGraderConfig'
+          chat-criteria-model-grader: '#/components/schemas/ChatCriteriaModelGraderConfig'
+          string-count-grader: '#/components/schemas/StringCountGraderConfig'
+          meteor-score-grader: '#/components/schemas/MeteorScoreGraderConfig'
+          gleu-score-grader: '#/components/schemas/GleuScoreGraderConfig'
+          discrete-classification-model-grader: '#/components/schemas/DiscreteClassificationModelGraderConfig'
+          set-comparison-grader: '#/components/schemas/SetComparisonGraderConfig'
+          multiclass-classification-grader: '#/components/schemas/MulticlassClassificationGraderConfig'
+    InnerError:
+      title: InnerError
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/InnerErrorCode'
+        innererror:
+          $ref: '#/components/schemas/InnerError'
+      description: "Inner error as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses)."
+    InnerErrorCode:
+      title: InnerErrorCode
+      enum:
+        - invalidPayload
+      type: string
+      description: "Inner error codes as defined in the Microsoft REST guidelines\r\n(https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses)."
+      x-ms-enum:
+        name: InnerErrorCode
+        modelAsString: true
+        values:
+          - value: invalidPayload
+            description: The request data is invalid for this operation.
+    LifeCycleStatus:
+      title: LifeCycleStatus
+      enum:
+        - preview
+        - generally-available
+      type: string
+      description: "The life cycle status of a model.\r\nNote: A model can be promoted from \"preview\" to \"generally-available\", but never from \"generally-available\" to \"preview\"."
+      x-ms-enum:
+        name: LifeCycleStatus
+        modelAsString: true
+        values:
+          - value: preview
+            description: Model is in preview and covered by the service preview terms.
+          - value: generally-available
+            description: Model is generally available.
+    LogLevel:
+      title: LogLevel
+      enum:
+        - info
+        - warning
+        - error
+      type: string
+      description: The verbosity level of an event.
+      x-ms-enum:
+        name: LogLevel
+        modelAsString: true
+        values:
+          - value: info
+            description: This event is for information only.
+          - value: warning
+            description: This event represents a mitigated issue.
+          - value: error
+            description: This message represents a non recoverable issue.
+    MeteorScoreGraderConfig:
+      title: MeteorScoreGraderConfig
+      required:
+        - hypothesis
+        - reference
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        hypothesis:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+    Model:
+      title: Model
+      required:
+        - capabilities
+        - deprecation
+        - lifecycle_status
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/FineTuningState'
+        model:
+          type: string
+          description: The base model identity (model-id) if this is a fine tune model; otherwise `null`.
+          nullable: true
+        fine_tune:
+          type: string
+          description: The fine tune job identity (fine-tune-id) if this is a fine tune model; otherwise `null`.
+          nullable: true
+        capabilities:
+          $ref: '#/components/schemas/Capabilities'
+        lifecycle_status:
+          $ref: '#/components/schemas/LifeCycleStatus'
+        deprecation:
+          $ref: '#/components/schemas/Deprecation'
+      description: A model is either a base model or the result of a successful fine tune job.
+    ModelGraderConfig:
+      title: ModelGraderConfig
+      required:
+        - model_name
+        - output_graders
+        - sampling_params
+        - trajectory_template
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        trajectory_template:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        model_name:
+          minLength: 1
+          type: string
+        sampling_params:
+          $ref: '#/components/schemas/ModelSamplingParams'
+        output_graders:
+          title: IList`1
+          type: array
+          items:
+            title: GraderConfig
+            oneOf:
+              - $ref: '#/components/schemas/SetMembershipGraderConfig'
+              - $ref: '#/components/schemas/StringCheckGraderConfig'
+              - $ref: '#/components/schemas/ConstantGraderConfig'
+              - $ref: '#/components/schemas/ModelGraderConfig'
+              - $ref: '#/components/schemas/RougeScoreGraderConfig'
+              - $ref: '#/components/schemas/BleuScoreGraderConfig'
+              - $ref: '#/components/schemas/ClosedQAModelGraderConfig'
+              - $ref: '#/components/schemas/FactualityModelGraderConfig'
+              - $ref: '#/components/schemas/ChatCriteriaModelGraderConfig'
+              - $ref: '#/components/schemas/StringCountGraderConfig'
+              - $ref: '#/components/schemas/MeteorScoreGraderConfig'
+              - $ref: '#/components/schemas/GleuScoreGraderConfig'
+              - $ref: '#/components/schemas/DiscreteClassificationModelGraderConfig'
+              - $ref: '#/components/schemas/SetComparisonGraderConfig'
+              - $ref: '#/components/schemas/MulticlassClassificationGraderConfig'
+    ModelList:
+      title: ModelList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Model'
+          description: The list of items.
+          nullable: true
+      description: Represents a list of models.
+    ModelSamplingParams:
+      title: ModelSamplingParams
+      required:
+        - max_tokens
+        - temperature
+      type: object
+      properties:
+        seed:
+          type: integer
+          format: int32
+          nullable: true
+        temperature:
+          type: number
+          format: float
+        max_tokens:
+          type: integer
+          format: int32
+        top_p:
+          type: number
+          format: float
+    ModelUsage:
+      title: ModelUsage
+      type: object
+      properties:
+        model_config:
+          title: IDictionary`2
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+        model_name:
+          type: string
+          nullable: true
+        invocation_count:
+          type: integer
+          format: int32
+        prompt_tokens:
+          type: integer
+          format: int32
+        completion_tokens:
+          type: integer
+          format: int32
+        total_tokens:
+          type: integer
+          format: int32
+    MulticlassClassificationGraderConfig:
+      title: MulticlassClassificationGraderConfig
+      required:
+        - case_sensitive
+        - hypothesis_set
+        - reference_set
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference_set:
+          $ref: '#/components/schemas/StringDelimitedSetExpressionConfig'
+        hypothesis_set:
+          $ref: '#/components/schemas/StringDelimitedSetExpressionConfig'
+        case_sensitive:
+          type: boolean
+    NonModelGraderConfig:
+      title: NonModelGraderConfig
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        type:
+          minLength: 1
+          type: string
+        name:
+          minLength: 1
+          type: string
+        description:
+          type: string
+          nullable: true
+      discriminator:
+        propertyName: type
+        mapping:
+          set-membership-grader: '#/components/schemas/SetMembershipGraderConfig'
+          string-check-grader: '#/components/schemas/StringCheckGraderConfig'
+          constant-grader: '#/components/schemas/ConstantGraderConfig'
+          rouge-score-grader: '#/components/schemas/RougeScoreGraderConfig'
+          bleu-score-grader: '#/components/schemas/BleuScoreGraderConfig'
+          string-count-grader: '#/components/schemas/StringCountGraderConfig'
+          meteor-score-grader: '#/components/schemas/MeteorScoreGraderConfig'
+          gleu-score-grader: '#/components/schemas/GleuScoreGraderConfig'
+          set-comparison-grader: '#/components/schemas/SetComparisonGraderConfig'
+          multiclass-classification-grader: '#/components/schemas/MulticlassClassificationGraderConfig'
+    OutputDataItemApiObject:
+      title: OutputDataItemApiObject
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        run_id:
+          type: string
+          nullable: true
+          readOnly: true
+        data_source_idx:
+          type: integer
+          format: int32
+          readOnly: true
+        item:
+          title: IDictionary`2
+          type: object
+          additionalProperties: { }
+          nullable: true
+          readOnly: true
+        sample:
+          $ref: '#/components/schemas/Sample'
+        grades:
+          title: IDictionary`2
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          nullable: true
+          readOnly: true
+        grader_samples:
+          title: IDictionary`2
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Sample'
+          nullable: true
+          readOnly: true
+    OutputDataItemList:
+      title: OutputDataItemList
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutputDataItemApiObject'
+          description: The list of items.
+          nullable: true
+        has_more:
+          type: boolean
+          description: A value indicating whether the list contains more elements than returned.
+      description: Represents a list of fine tunes.
+    OutputEvalRunStats:
+      title: OutputEvalRunStats
+      type: object
+      properties:
+        num_data_source_items:
+          type: integer
+          format: int32
+        num_samples:
+          type: integer
+          format: int32
+        num_errors:
+          type: integer
+          format: int32
+        per_model_usage:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelUsage'
+          nullable: true
+      description: Defines the values of a evaluation job.
+    PipelineConfig:
+      title: PipelineConfig
+      required:
+        - aggregators
+        - data_source
+        - graders
+        - sample_generator
+      type: object
+      properties:
+        data_source:
+          title: DataSourceConfig
+          oneOf:
+            - $ref: '#/components/schemas/FileServiceDataSourceConfig'
+          description: 'The data source. For now its a file-id, but needs to be changed to OpenAI data source.'
+        sample_generator:
+          $ref: '#/components/schemas/SampleGeneratorConfig'
+        graders:
+          title: IList`1
+          type: array
+          items:
+            title: GraderConfig
+            oneOf:
+              - $ref: '#/components/schemas/SetMembershipGraderConfig'
+              - $ref: '#/components/schemas/StringCheckGraderConfig'
+              - $ref: '#/components/schemas/ConstantGraderConfig'
+              - $ref: '#/components/schemas/ModelGraderConfig'
+              - $ref: '#/components/schemas/RougeScoreGraderConfig'
+              - $ref: '#/components/schemas/BleuScoreGraderConfig'
+              - $ref: '#/components/schemas/ClosedQAModelGraderConfig'
+              - $ref: '#/components/schemas/FactualityModelGraderConfig'
+              - $ref: '#/components/schemas/ChatCriteriaModelGraderConfig'
+              - $ref: '#/components/schemas/StringCountGraderConfig'
+              - $ref: '#/components/schemas/MeteorScoreGraderConfig'
+              - $ref: '#/components/schemas/GleuScoreGraderConfig'
+              - $ref: '#/components/schemas/DiscreteClassificationModelGraderConfig'
+              - $ref: '#/components/schemas/SetComparisonGraderConfig'
+              - $ref: '#/components/schemas/MulticlassClassificationGraderConfig'
+          description: The list of graders.
+        aggregators:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/AggregatorConfig'
+          description: The list of aggregators.
+    Purpose:
+      title: Purpose
+      enum:
+        - fine-tune
+        - fine-tune-results
+        - assistants
+        - assistants_output
+      type: string
+      description: The intended purpose of the uploaded documents. Use "fine-tune" for fine-tuning. This allows us to validate the format of the uploaded file.
+      readOnly: true
+      x-ms-enum:
+        name: Purpose
+        modelAsString: true
+        values:
+          - value: fine-tune
+            description: This file contains training data for a fine tune job.
+          - value: fine-tune-results
+            description: This file contains the results of a fine tune job.
+          - value: assistants
+            description: This file contains data to be used in assistants.
+          - value: assistants_output
+            description: This file contains the results of an assistant.
+    RougeScoreGraderConfig:
+      title: RougeScoreGraderConfig
+      required:
+        - hypothesis
+        - reference
+        - rouge_type
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        hypothesis:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        rouge_type:
+          $ref: '#/components/schemas/RougeType'
+    RougeType:
+      title: RougeType
+      enum:
+        - rouge-1
+        - rouge-2
+        - rouge-3
+        - rouge-4
+        - rouge-5
+        - rouge-l
+      type: string
+    RunApiObject:
+      title: RunApiObject
+      required:
+        - pipeline_config
+        - run_type
+        - status
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        org_id:
+          type: string
+          description: The organisation id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.
+          nullable: true
+        user_id:
+          type: string
+          description: The user id of this evaluation run. Unused on Azure OpenAI; compatibility for OpenAI only.
+          nullable: true
+        run_type:
+          $ref: '#/components/schemas/RunType'
+        status:
+          title: EvalRunStatus
+          oneOf:
+            - $ref: '#/components/schemas/EvalRunStatusValidating'
+            - $ref: '#/components/schemas/EvalRunStatusWaiting'
+            - $ref: '#/components/schemas/EvalRunStatusRunning'
+            - $ref: '#/components/schemas/EvalRunStatusFailed'
+            - $ref: '#/components/schemas/EvalRunStatusSucceeded'
+          description: The status of this run or item.
+          readOnly: true
+        evaluated_model_name:
+          type: string
+          nullable: true
+          readOnly: true
+        display_name:
+          type: string
+          nullable: true
+        updated_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        aggregation_outputs:
+          $ref: '#/components/schemas/AggregationResultList'
+        aggregation_file_id:
+          type: string
+          nullable: true
+          readOnly: true
+        output_data_fileId:
+          type: string
+          nullable: true
+          readOnly: true
+        pipeline_config:
+          $ref: '#/components/schemas/PipelineConfig'
+        run_stats:
+          $ref: '#/components/schemas/OutputEvalRunStats'
+        validation_stats:
+          $ref: '#/components/schemas/BaseEvalRunStats'
+      description: Defines the values of a evaluation job.
+    RunStatus:
+      title: RunStatus
+      enum:
+        - all
+        - active
+        - complete
+        - failed
+        - success
+      type: string
+      description: The state of a evaluation.
+    RunStatusPollApiObject:
+      title: RunStatusPollApiObject
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        run_id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        status:
+          title: EvalRunStatus
+          oneOf:
+            - $ref: '#/components/schemas/EvalRunStatusValidating'
+            - $ref: '#/components/schemas/EvalRunStatusWaiting'
+            - $ref: '#/components/schemas/EvalRunStatusRunning'
+            - $ref: '#/components/schemas/EvalRunStatusFailed'
+            - $ref: '#/components/schemas/EvalRunStatusSucceeded'
+          description: The status of this run or item.
+          nullable: true
+          readOnly: true
+        cancel_requested_at:
+          type: integer
+          description: A timestamp when this job or item was cancelled (in unix epochs).
+          format: int32
+          nullable: true
+          readOnly: true
+    RunType:
+      title: RunType
+      enum:
+        - dry-run
+        - full-run
+        - batch-run
+      type: string
+      description: The state of a file.
+    Sample:
+      title: Sample
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        trajectory:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          nullable: true
+          readOnly: true
+        outputs:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          nullable: true
+          readOnly: true
+      readOnly: true
+    SampleGeneratorConfig:
+      title: SampleGeneratorConfig
+      required:
+        - model_name
+        - sampling_params
+        - trajectory_template
+      type: object
+      properties:
+        trajectory_template:
+          title: IList`1
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        model_name:
+          minLength: 1
+          type: string
+        sampling_params:
+          $ref: '#/components/schemas/ModelSamplingParams'
+    SetComparisonGraderConfig:
+      title: SetComparisonGraderConfig
+      required:
+        - case_sensitive
+        - comparison_disjoint_grade
+        - comparison_equal_grade
+        - comparison_intersect_grade
+        - comparison_subset_grade
+        - comparison_superset_grade
+        - hypothesis_set
+        - reference_set
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference_set:
+          $ref: '#/components/schemas/StringDelimitedSetExpressionConfig'
+        hypothesis_set:
+          $ref: '#/components/schemas/StringDelimitedSetExpressionConfig'
+        case_sensitive:
+          type: boolean
+        comparison_equal_grade:
+          type: number
+          format: float
+        comparison_subset_grade:
+          type: number
+          format: float
+        comparison_superset_grade:
+          type: number
+          format: float
+        comparison_intersect_grade:
+          type: number
+          format: float
+        comparison_disjoint_grade:
+          type: number
+          format: float
+    SetMembershipGraderConfig:
+      title: SetMembershipGraderConfig
+      required:
+        - absent_grade
+        - case_sensitive
+        - element
+        - present_grade
+        - set
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        element:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        set:
+          title: HashSet`1
+          uniqueItems: true
+          type: array
+          items:
+            title: ExpressionConfig
+            oneOf:
+              - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+              - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+              - $ref: '#/components/schemas/ConstantExpressionConfig'
+        case_sensitive:
+          type: boolean
+        present_grade:
+          type: number
+          format: float
+        absent_grade:
+          type: number
+          format: float
+    StringCheckGraderConfig:
+      title: StringCheckGraderConfig
+      required:
+        - case_sensitive
+        - false_grade
+        - lhs
+        - operation
+        - rhs
+        - true_grade
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        lhs:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        rhs:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        case_sensitive:
+          type: boolean
+        operation:
+          $ref: '#/components/schemas/StringCheckGraderConfigOperation'
+        true_grade:
+          type: number
+          format: float
+        false_grade:
+          type: number
+          format: float
+    StringCheckGraderConfigOperation:
+      title: StringCheckGraderConfigOperation
+      enum:
+        - equals
+        - contains
+        - starts-with
+        - ends-with
+      type: string
+    StringCountGraderConfig:
+      title: StringCountGraderConfig
+      required:
+        - case_sensitive
+        - hypothesis
+        - reference
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NonModelGraderConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        reference:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        hypothesis:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+        case_sensitive:
+          type: boolean
+    StringDelimitedSetExpressionConfig:
+      title: StringDelimitedSetExpressionConfig
+      required:
+        - delimiter
+        - expression
+      type: object
+      properties:
+        delimiter:
+          minLength: 1
+          type: string
+        expression:
+          title: ExpressionConfig
+          oneOf:
+            - $ref: '#/components/schemas/VariableReferenceExpressionConfig'
+            - $ref: '#/components/schemas/TemplateStringExpressionConfig'
+            - $ref: '#/components/schemas/ConstantExpressionConfig'
+    TemplateStringExpressionConfig:
+      title: TemplateStringExpressionConfig
+      required:
+        - template
+        - type
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ExpressionConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        template:
+          minLength: 1
+          type: string
+    TypeDiscriminator:
+      title: TypeDiscriminator
+      enum:
+        - list
+        - fine_tuning.job
+        - file
+        - fine_tuning.job.event
+        - fine_tuning.job.checkpoint
+        - model
+        - upload
+        - upload.part
+      type: string
+      description: Defines the type of an object.
+      readOnly: true
+      x-ms-enum:
+        name: TypeDiscriminator
+        modelAsString: true
+        values:
+          - value: list
+            description: This object represents a list of other objects.
+          - value: fine_tuning.job
+            description: This object represents a fine tune job.
+          - value: file
+            description: This object represents a file.
+          - value: fine_tuning.job.event
+            description: This object represents an event of a fine tuning job.
+          - value: fine_tuning.job.checkpoint
+            description: This object represents a checkpoint of a fine tuning job.
+          - value: model
+            description: This object represents a model (can be a base model or fine tune job result).
+          - value: upload
+            description: This object represents a file upload.
+          - value: upload.part
+            description: This object represents part of a file upload.
+    UploadFileCompleteBody:
+      title: UploadFileCompleteBody
+      required:
+        - part_ids
+      type: object
+      properties:
+        part_ids:
+          title: IList`1
+          type: array
+          items:
+            type: string
+        md5:
+          type: string
+          nullable: true
+    UploadFileStartBody:
+      title: UploadFileStartBody
+      required:
+        - bytes
+        - filename
+        - mime_type
+        - purpose
+      type: object
+      properties:
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        filename:
+          minLength: 1
+          type: string
+        bytes:
+          type: integer
+          format: int64
+        mime_type:
+          minLength: 1
+          type: string
+    UploadPartResource:
+      title: UploadPartResource
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        upload_id:
+          type: string
+          nullable: true
+          readOnly: true
+        azure_block_id:
+          type: string
+          nullable: true
+          readOnly: true
+    UploadResource:
+      title: UploadResource
+      type: object
+      properties:
+        object:
+          $ref: '#/components/schemas/TypeDiscriminator'
+        created_at:
+          type: integer
+          description: A timestamp when this job or item was created (in unix epochs).
+          format: unixtime
+          readOnly: true
+        id:
+          type: string
+          description: The identity of this item.
+          nullable: true
+          readOnly: true
+        bytes:
+          type: integer
+          format: int64
+          readOnly: true
+        filename:
+          type: string
+          nullable: true
+          readOnly: true
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        status:
+          $ref: '#/components/schemas/UploadStatus'
+        expires_at:
+          type: integer
+          format: unixtime
+          readOnly: true
+        file:
+          $ref: '#/components/schemas/File'
+    UploadStatus:
+      title: UploadStatus
+      enum:
+        - pending
+        - expired
+        - completed
+        - cancelled
+      type: string
+      readOnly: true
+    VariableReferenceExpressionConfig:
+      title: VariableReferenceExpressionConfig
+      required:
+        - namespace_name
+        - type
+        - variable_name
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ExpressionConfig'
+      properties:
+        type:
+          minLength: 1
+          type: string
+        namespace_name:
+          minLength: 1
+          type: string
+        variable_name:
+          minLength: 1
+          type: string
+  parameters:
+    endpoint:
+      name: endpoint
+      in: path
+      description: 'Supported Cognitive Services endpoints (protocol and hostname, for example: https://aoairesource.openai.azure.com. Replace "aoairesource" with your Azure OpenAI account name).'
+      required: true
+      schema:
+        type: string
+        format: url
+      x-ms-skip-url-encoding: true
+      x-ms-parameter-location: client
+    apiVersionQueryParameter:
+      name: api-version
+      in: query
+      description: The requested API version.
+      required: true
+      schema:
+        type: string
+        x-ms-client-default: 2024-08-01-preview
+      x-ms-parameter-location: client
+  securitySchemes:
+    api-key:
+      type: apiKey
+      description: Provide your Cognitive Services Azure OpenAI account key here.
+      name: api-key
+      in: header
+security:
+  - api-key: [ ]
+schemes:
+  - https
+x-ms-parameterized-host:
+  hostTemplate: '{endpoint}/openai'
+  useSchemePrefix: false
+  parameters:
+    - $ref: '#/parameters/endpoint'
