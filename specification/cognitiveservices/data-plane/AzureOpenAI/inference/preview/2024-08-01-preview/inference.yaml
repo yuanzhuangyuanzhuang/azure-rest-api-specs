@@ -2388,7 +2388,7 @@ components:
                       additionalProperties:
                         type: number
                   usage:
-                    $ref: "#/components/schemas/CompletionUsage"
+                    $ref: "#/components/schemas/completionUsage"
               text:
                 type: string
               content_filter_results:
