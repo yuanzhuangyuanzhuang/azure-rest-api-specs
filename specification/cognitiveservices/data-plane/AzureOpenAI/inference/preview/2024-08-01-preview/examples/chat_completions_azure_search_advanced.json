@@ -77,7 +77,8 @@
                     "title": "Citation Title 2",
                     "filepath": "contoso2.txt",
                     "url": "https://contoso.blob.windows.net/container/contoso2.txt",
-                    "chunk_id": "0"
+                    "chunk_id": "0",
+                    "rerank_score": 0.9
                   }
                 ],
                 "intent": "dog care"
